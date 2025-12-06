@@ -122,52 +122,64 @@ export async function POST(req: NextRequest) {
       language: body.language
     })
 
-    // 使用 LangChain 標準的 LangSmith Client 創建 run（確保項目名稱正確）
-    const langsmithClient = new Client({
-      apiUrl: process.env.LANGCHAIN_ENDPOINT || "https://api.smith.langchain.com",
-      apiKey: process.env.LANGCHAIN_API_KEY,
-    })
+    // 檢查 LangSmith 是否已配置
+    const isLangSmithEnabled = !!(process.env.LANGCHAIN_API_KEY && process.env.LANGCHAIN_TRACING_V2 === 'true')
     
-    // 明確使用項目名稱 dse-math-tutoring（不使用環境變量，避免發送到 default）
-    const projectName = 'dse-math-tutoring'
-    runId = randomUUID()
-    const userMessage = body.messages.map(m => m.content).join('\n')
-    
-    // 使用 LangSmith Client 的 createRun 方法，確保項目名稱正確
-    await langsmithClient.createRun({
-      id: runId,
-      name: `Stream Chat - ${body.mode}`,
-      run_type: 'chain',
-      project_name: projectName, // 明確設置項目名稱
-      inputs: {
-        messages: body.messages,
-        mode: body.mode,
-        difficulty: body.difficulty,
-        language: body.language,
-        userMessage: userMessage,
-        messageCount: body.messages.length
-      },
-      tags: [
-        'math-chat',
-        'streaming',
-        `mode:${body.mode}`,
-        `difficulty:${body.difficulty}`,
-        `language:${body.language}`
-      ],
-      extra: {
-        metadata: {
-          sessionId: (body as any).sessionId || 'unknown',
-          userId: (body as any).userId || 'anonymous',
-          startTime: startTime,
-          endpoint: '/api/chat/stream',
-          streaming: true,
-          application: 'dse-math-tutoring'
-        }
-      },
-      start_time: Date.now()
-    })
-    
-    console.log(`✅ LangSmith stream run created: ${runId} for project: ${projectName}`)
+    if (isLangSmithEnabled) {
+      // 使用 LangChain 標準的 LangSmith Client 創建 run（確保項目名稱正確）
+      const langsmithClient = new Client({
+        apiUrl: process.env.LANGCHAIN_ENDPOINT || "https://api.smith.langchain.com",
+        apiKey: process.env.LANGCHAIN_API_KEY,
+      })
+      
+      // 明確使用項目名稱 dse-math-tutoring（不使用環境變量，避免發送到 default）
+      const projectName = 'dse-math-tutoring'
+      runId = randomUUID()
+      const userMessage = body.messages.map(m => m.content).join('\n')
+      
+      try {
+        // 使用 LangSmith Client 的 createRun 方法，確保項目名稱正確
+        await langsmithClient.createRun({
+          id: runId,
+          name: `Stream Chat - ${body.mode}`,
+          run_type: 'chain',
+          project_name: projectName, // 明確設置項目名稱
+          inputs: {
+            messages: body.messages,
+            mode: body.mode,
+            difficulty: body.difficulty,
+            language: body.language,
+            userMessage: userMessage,
+            messageCount: body.messages.length
+          },
+          tags: [
+            'math-chat',
+            'streaming',
+            `mode:${body.mode}`,
+            `difficulty:${body.difficulty}`,
+            `language:${body.language}`
+          ],
+          extra: {
+            metadata: {
+              sessionId: (body as any).sessionId || 'unknown',
+              userId: (body as any).userId || 'anonymous',
+              startTime: startTime,
+              endpoint: '/api/chat/stream',
+              streaming: true,
+              application: 'dse-math-tutoring'
+            }
+          },
+          start_time: Date.now()
+        })
+        
+        console.log(`✅ LangSmith stream run created: ${runId} for project: ${projectName}`)
+      } catch (error) {
+        console.warn('⚠️ LangSmith tracking failed (continuing without tracing):', error instanceof Error ? error.message : String(error))
+        runId = undefined // 清除 runId，避免後續更新失敗
+      }
+    } else {
+      console.log('ℹ️ LangSmith tracking is disabled (LANGCHAIN_API_KEY not configured)')
+    }
 
     const stream = await getAIAPIManager().sendMessage(aiRequest)
 
@@ -198,23 +210,30 @@ export async function POST(req: NextRequest) {
               const fullContent = contentBuffer.join('')
               const responseTime = Date.now() - startTime
               
-              const langsmithClient = new Client({
-                apiUrl: process.env.LANGCHAIN_ENDPOINT || "https://api.smith.langchain.com",
-                apiKey: process.env.LANGCHAIN_API_KEY,
-              })
+              if (runId && isLangSmithEnabled) {
+                try {
+                  const langsmithClient = new Client({
+                    apiUrl: process.env.LANGCHAIN_ENDPOINT || "https://api.smith.langchain.com",
+                    apiKey: process.env.LANGCHAIN_API_KEY,
+                  })
 
-              await langsmithClient.updateRun(runId, {
-                outputs: {
-                  aiResponse: fullContent.substring(0, 1000), // 限制長度
-                  responseText: fullContent,
-                  mcpCallsExecuted: mcpCallInfos.length,
-                  responseTime: responseTime,
-                  streaming: true
-                },
-                end_time: Date.now()
-              })
+                  await langsmithClient.updateRun(runId, {
+                    outputs: {
+                      aiResponse: fullContent.substring(0, 1000), // 限制長度
+                      responseText: fullContent,
+                      mcpCallsExecuted: mcpCallInfos.length,
+                      responseTime: responseTime,
+                      streaming: true
+                    },
+                    end_time: Date.now()
+                  })
 
-              console.log(`✅ LangSmith stream run updated: ${runId}`)
+                  console.log(`✅ LangSmith stream run updated: ${runId}`)
+                } catch (error) {
+                  console.warn('⚠️ Failed to update LangSmith run:', error instanceof Error ? error.message : String(error))
+                }
+              }
+              
               controller.close()
               break
             }
@@ -244,47 +263,53 @@ export async function POST(req: NextRequest) {
                     mcpCallInfos.push(...mcpInfos)
                     
                     // 為每個 MCP 調用創建子 run（使用 LangSmith Client 標準方法）
-                    const langsmithClient = new Client({
-                      apiUrl: process.env.LANGCHAIN_ENDPOINT || "https://api.smith.langchain.com",
-                      apiKey: process.env.LANGCHAIN_API_KEY,
-                    })
-                    
-                    // 明確使用項目名稱 dse-math-tutoring（不使用環境變量，避免發送到 default）
-    const projectName = 'dse-math-tutoring'
-                    
-                    for (const mcpInfo of mcpInfos) {
-                      if (mcpInfo.toolName) {
-                        const toolRunId = randomUUID()
-                        await langsmithClient.createRun({
-                          id: toolRunId,
-                          name: `${mcpInfo.toolName} Tool`,
-                          run_type: 'tool',
-                          parent_run_id: runId,
-                          project_name: projectName, // 明確設置項目名稱
-                          inputs: {
-                            tool: mcpInfo.toolName,
-                            parameters: mcpInfo.details?.parameters || {},
-                            input: mcpInfo.details?.parameters || {}
-                          },
-                          outputs: mcpInfo.status === 'success' ? {
-                            result: mcpInfo.details?.result,
-                            success: true
-                          } : {
-                            error: mcpInfo.details?.error,
-                            success: false
-                          },
-                          tags: ['mcp-tool', `tool:${mcpInfo.toolName}`, `mode:${body.mode}`],
-                          extra: {
-                            metadata: {
-                              toolType: 'mcp',
-                              executionTime: mcpInfo.details?.executionTime || 0,
-                              mode: body.mode,
-                              application: 'dse-math-tutoring'
-                            }
-                          },
-                          start_time: Date.now(),
-                          end_time: Date.now()
+                    if (runId && isLangSmithEnabled) {
+                      try {
+                        const langsmithClient = new Client({
+                          apiUrl: process.env.LANGCHAIN_ENDPOINT || "https://api.smith.langchain.com",
+                          apiKey: process.env.LANGCHAIN_API_KEY,
                         })
+                        
+                        // 明確使用項目名稱 dse-math-tutoring（不使用環境變量，避免發送到 default）
+                        const projectName = 'dse-math-tutoring'
+                        
+                        for (const mcpInfo of mcpInfos) {
+                          if (mcpInfo.toolName) {
+                            const toolRunId = randomUUID()
+                            await langsmithClient.createRun({
+                              id: toolRunId,
+                              name: `${mcpInfo.toolName} Tool`,
+                              run_type: 'tool',
+                              parent_run_id: runId,
+                              project_name: projectName, // 明確設置項目名稱
+                              inputs: {
+                                tool: mcpInfo.toolName,
+                                parameters: mcpInfo.details?.parameters || {},
+                                input: mcpInfo.details?.parameters || {}
+                              },
+                              outputs: mcpInfo.status === 'success' ? {
+                                result: mcpInfo.details?.result,
+                                success: true
+                              } : {
+                                error: mcpInfo.details?.error,
+                                success: false
+                              },
+                              tags: ['mcp-tool', `tool:${mcpInfo.toolName}`, `mode:${body.mode}`],
+                              extra: {
+                                metadata: {
+                                  toolType: 'mcp',
+                                  executionTime: mcpInfo.details?.executionTime || 0,
+                                  mode: body.mode,
+                                  application: 'dse-math-tutoring'
+                                }
+                              },
+                              start_time: Date.now(),
+                              end_time: Date.now()
+                            })
+                          }
+                        }
+                      } catch (error) {
+                        console.warn('⚠️ Failed to create LangSmith tool runs:', error instanceof Error ? error.message : String(error))
                       }
                     }
                   }
@@ -342,20 +367,23 @@ export async function POST(req: NextRequest) {
     // 如果有 runId，更新 run 記錄錯誤
     if (typeof runId !== 'undefined') {
       try {
-        const langsmithClient = new Client({
-          apiUrl: process.env.LANGCHAIN_ENDPOINT || "https://api.smith.langchain.com",
-          apiKey: process.env.LANGCHAIN_API_KEY,
-        })
-        
-        await langsmithClient.updateRun(runId, {
-          outputs: {
-            error: error instanceof Error ? error.message : 'Unknown error',
-            success: false
-          },
-          end_time: Date.now()
-        })
+        const isLangSmithEnabled = !!(process.env.LANGCHAIN_API_KEY && process.env.LANGCHAIN_TRACING_V2 === 'true')
+        if (isLangSmithEnabled) {
+          const langsmithClient = new Client({
+            apiUrl: process.env.LANGCHAIN_ENDPOINT || "https://api.smith.langchain.com",
+            apiKey: process.env.LANGCHAIN_API_KEY,
+          })
+          
+          await langsmithClient.updateRun(runId, {
+            outputs: {
+              error: error instanceof Error ? error.message : 'Unknown error',
+              success: false
+            },
+            end_time: Date.now()
+          })
+        }
       } catch (updateError) {
-        console.error('Failed to update LangSmith run with error:', updateError)
+        console.warn('⚠️ Failed to update LangSmith run with error:', updateError)
       }
     }
 

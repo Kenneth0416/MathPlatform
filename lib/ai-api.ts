@@ -65,8 +65,7 @@ class OpenAICompatibleClient {
       // On server-side, we need the full URL. Use environment variable or default to localhost
       if (typeof window === 'undefined') {
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
-                       process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
-                       'http://localhost:3000'
+                       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
         url = `${baseUrl}/api/poe`
       } else {
         // Client-side: use relative URL
