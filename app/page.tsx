@@ -7,6 +7,7 @@ import { PostCard } from "@/components/post-card"
 import { CreatePostDialog } from "@/components/create-post-dialog"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useI18n } from "@/lib/i18n-context"
 
 const posts = [
   {
@@ -100,10 +101,11 @@ const posts = [
 ]
 
 export default function CommunityPage() {
+  const { t } = useI18n()
   const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set())
   const [bookmarkedPosts, setBookmarkedPosts] = useState<Set<number>>(new Set())
   const [showCreateDialog, setShowCreateDialog] = useState(false)
-  const [activeFilter, setActiveFilter] = useState("推荐")
+  const [activeFilter, setActiveFilter] = useState(t('community.recommended'))
 
   const toggleLike = (postId: number) => {
     setLikedPosts((prev) => {
@@ -140,7 +142,14 @@ export default function CommunityPage() {
 
       <div className="sticky top-0 z-30 bg-background border-b border-border">
         <div className="flex items-center gap-2 px-4 py-3 overflow-x-auto scrollbar-hide max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto">
-          {["推荐", "代数", "几何", "微积分", "概率统计", "竞赛"].map((topic) => (
+          {[
+            t('community.recommended'),
+            t('community.algebra'),
+            t('community.geometry'),
+            t('community.calculus'),
+            t('community.statistics'),
+            t('community.competition'),
+          ].map((topic) => (
             <Button
               key={topic}
               variant={activeFilter === topic ? "default" : "outline"}

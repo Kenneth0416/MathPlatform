@@ -162,3 +162,24 @@
     transform: rotate(-90deg);
   }
 }
+
+/* KaTeX 數學公式樣式增強 */
+@layer base {
+  /* 確保數學公式正確渲染 */
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin: 1rem 0;
+  }
+
+  .katex {
+    font-size: 1.1em;
+  }
+  
+  /* 改善數學公式在小屏幕上的顯示 */
+  @media (max-width: 768px) {
+    .katex-display {
+      font-size: 0.9em;
+    }
+  }
+}

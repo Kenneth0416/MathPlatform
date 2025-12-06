@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "math-service": {
+      "command": "/Users/kenneth/Documents/MCP/MathMCP/run_mcp.sh"
+    }
+  }
+}
+
+

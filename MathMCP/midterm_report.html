@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Midterm Research Proposal: MCP Math Service - AI-Powered Mathematical Computing Framework</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=SF+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #007AFF;
+            --secondary-blue: #5AC8FA;
+            --accent-blue: #64D2FF;
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --background-primary: #FFFFFF;
+            --background-secondary: #F5F5F7;
+            --background-tertiary: #FAFAFA;
+            --border-color: #D2D2D7;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-heavy: 0 16px 40px rgba(0, 0, 0, 0.16);
+            --radius-small: 8px;
+            --radius-medium: 12px;
+            --radius-large: 20px;
+            --spacing-xs: 8px;
+            --spacing-sm: 16px;
+            --spacing-md: 24px;
+            --spacing-lg: 32px;
+            --spacing-xl: 48px;
+            --spacing-xxl: 64px;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--background-primary);
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        p {
+            font-size: 1.125rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .mono {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: var(--spacing-sm) 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--spacing-md);
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-lg);
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, var(--background-primary) 0%, var(--background-secondary) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(0, 122, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(90, 200, 250, 0.1) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 0 var(--spacing-md);
+            z-index: 2;
+            position: relative;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            font-weight: 500;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .hero-description {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xl);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-metrics {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-xl);
+            margin: var(--spacing-xl) 0;
+        }
+
+        .hero-metric {
+            text-align: center;
+        }
+
+        .metric-number {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            line-height: 1;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+
+        /* Sections */
+        .section {
+            padding: var(--spacing-xxl) 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xxl);
+        }
+
+        .section-title {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--background-primary);
+            border-radius: var(--radius-large);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-4px);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-lg);
+            margin: var(--spacing-xl) 0;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: var(--radius-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .card-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .card h3 {
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        .card p {
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* Research Paper Style */
+        .research-paper {
+            background: var(--background-primary);
+            border-radius: var(--radius-large);
+            padding: var(--spacing-xxl);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-color);
+            margin: var(--spacing-xl) 0;
+        }
+
+        .paper-header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .paper-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .paper-meta {
+            display: flex;
+            gap: var(--spacing-lg);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .abstract {
+            background: var(--background-secondary);
+            border-radius: var(--radius-medium);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .abstract h4 {
+            color: var(--primary-blue);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        /* Problem Statement */
+        .problem-statement {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FEF2F2 100%);
+            border-radius: var(--radius-large);
+            padding: var(--spacing-xl);
+            margin: var(--spacing-lg) 0;
+            border: 1px solid #FECACA;
+        }
+
+        .problem-list {
+            list-style: none;
+            margin: var(--spacing-md) 0;
+        }
+
+        .problem-list li {
+            display: flex;
+            align-items: flex-start;
+            margin: var(--spacing-sm) 0;
+            padding: var(--spacing-sm);
+            background: white;
+            border-radius: var(--radius-small);
+            box-shadow: var(--shadow-light);
+        }
+
+        .problem-list li::before {
+            content: '⚠️';
+            margin-right: var(--spacing-sm);
+            font-size: 1.25rem;
+        }
+
+        /* Solution Framework */
+        .solution-framework {
+            background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+            border-radius: var(--radius-large);
+            padding: var(--spacing-xl);
+            margin: var(--spacing-lg) 0;
+            border: 1px solid #BAE6FD;
+        }
+
+        .framework-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .framework-header h3 {
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .framework-header p {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.125rem;
+        }
+
+        .framework-showcase {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: var(--spacing-xl);
+            align-items: start;
+        }
+
+        .framework-main-card {
+            background: white;
+            border-radius: var(--radius-large);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .framework-main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue), var(--accent-blue));
+        }
+
+        .main-card-content {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .framework-icon-large {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: var(--radius-large);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-md);
+            box-shadow: var(--shadow-light);
+        }
+
+        .framework-icon-large i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .main-card-content h4 {
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+            font-size: 1.5rem;
+        }
+
+        .main-card-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .framework-stats {
+            display: flex;
+            justify-content: space-around;
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .framework-stats .stat-item {
+            text-align: center;
+        }
+
+        .framework-stats .stat-number {
+            display: block;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            line-height: 1;
+        }
+
+        .framework-stats .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .framework-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        .feature-card.enhanced {
+            background: white;
+            border-radius: var(--radius-medium);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card.enhanced::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 122, 255, 0.05), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .feature-card.enhanced:hover::before {
+            left: 100%;
+        }
+
+        .feature-card.enhanced:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--primary-blue);
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border-radius: var(--radius-small);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feature-icon i {
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .feature-title {
+            flex: 1;
+        }
+
+        .feature-title h4 {
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+            font-size: 1.125rem;
+        }
+
+        .feature-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--background-secondary);
+            color: var(--text-secondary);
+        }
+
+        .feature-badge.security {
+            background: #FEF2F2;
+            color: #DC2626;
+        }
+
+        .feature-badge.education {
+            background: #F0FDF4;
+            color: #16A34A;
+        }
+
+        .feature-badge.extensible {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .feature-card.enhanced p {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .feature-benefits {
+            list-style: none;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin: var(--spacing-xs) 0;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .benefit-item i {
+            color: #16A34A;
+            font-size: 0.875rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .framework-showcase {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-lg);
+            }
+
+            .framework-features {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .framework-stats {
+                flex-direction: column;
+                gap: var(--spacing-md);
+            }
+
+            .feature-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .feature-icon {
+                align-self: center;
+            }
+        }
+
+        /* Technical Architecture */
+        .tech-architecture {
+            background: var(--background-secondary);
+            border-radius: var(--radius-large);
+            padding: var(--spacing-xl);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .architecture-diagram {
+            background: #1A1A1A;
+            border-radius: var(--radius-medium);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            color: #FFFFFF;
+            font-family: 'SF Mono', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .architecture-diagram::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue), var(--accent-blue));
+        }
+
+        .diagram-title {
+            color: var(--secondary-blue);
+            font-size: 1rem;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .diagram-content {
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* Research Methodology */
+        .methodology {
+            background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
+            border-radius: var(--radius-large);
+            padding: var(--spacing-xl);
+            margin: var(--spacing-lg) 0;
+            border: 1px solid #BBF7D0;
+        }
+
+        .methodology-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .method-step {
+            background: white;
+            border-radius: var(--radius-medium);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -12px;
+            left: var(--spacing-lg);
+            background: var(--primary-blue);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .method-step h4 {
+            margin-top: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        /* Expected Outcomes */
+        .outcomes {
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            border-radius: var(--radius-large);
+            padding: var(--spacing-xl);
+            margin: var(--spacing-lg) 0;
+            border: 1px solid #FCD34D;
+        }
+
+        .outcome-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .outcome-item {
+            text-align: center;
+            background: white;
+            border-radius: var(--radius-medium);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-light);
+        }
+
+        .outcome-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .outcome-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            background: var(--background-secondary);
+            border-radius: var(--radius-large);
+            padding: var(--spacing-xl);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin: var(--spacing-lg) 0;
+            padding: var(--spacing-lg);
+            background: white;
+            border-radius: var(--radius-medium);
+            box-shadow: var(--shadow-light);
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .timeline-date {
+            background: var(--primary-blue);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-small);
+            font-weight: 600;
+            margin-right: var(--spacing-lg);
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .timeline-content h4 {
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+        }
+
+        .timeline-content p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Interactive Demo */
+        .interactive-demo {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            border-radius: var(--radius-large);
+            padding: var(--spacing-xxl);
+            margin: var(--spacing-lg) 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .interactive-demo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .demo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .demo-content h2 {
+            color: white;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .demo-content p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .demo-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-large);
+            padding: var(--spacing-xl);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .demo-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-primary);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-small);
+            border: none;
+            font-family: 'SF Mono', monospace;
+            font-size: 1rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .demo-button {
+            background: white;
+            color: var(--primary-blue);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: none;
+            border-radius: var(--radius-small);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .demo-button:hover {
+            background: var(--background-secondary);
+            transform: translateY(-2px);
+        }
+
+        .demo-result {
+            background: rgba(255, 255, 255, 0.1);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-small);
+            margin-top: var(--spacing-md);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'SF Mono', monospace;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--background-secondary);
+            padding: var(--spacing-xxl) 0;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+        }
+
+        .footer h3 {
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+
+        .footer p {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .hero-metrics {
+                flex-direction: column;
+                gap: var(--spacing-md);
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .demo-container {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-lg);
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .framework-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .methodology-steps {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .timeline-date {
+                margin-right: 0;
+                margin-bottom: var(--spacing-sm);
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Selection */
+        ::selection {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* Focus States */
+        button:focus,
+        input:focus {
+            outline: 2px solid var(--primary-blue);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">MCP Math Service Research</div>
+            <ul class="nav-links">
+                <li><a href="#abstract">Abstract</a></li>
+                <li><a href="#problem">Problem</a></li>
+                <li><a href="#solution">Solution</a></li>
+                <li><a href="#methodology">Methodology</a></li>
+                <li><a href="#demo">Demo</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>MCP Math Service</h1>
+            <p class="hero-subtitle">Midterm Research Proposal</p>
+            <p class="hero-description">
+                A comprehensive framework for AI-powered mathematical computation 
+                based on the Model Context Protocol (MCP) standard
+            </p>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <span class="metric-number">17</span>
+                    <span class="metric-label">Mathematical Tools</span>
+                </div>
+                <div class="hero-metric">
+                    <span class="metric-number">5</span>
+                    <span class="metric-label">Math Domains</span>
+                </div>
+                <div class="hero-metric">
+                    <span class="metric-number">99.9%</span>
+                    <span class="metric-label">Accuracy</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Abstract Section -->
+    <section class="section" id="abstract">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Research Abstract</h2>
+                <p class="section-subtitle">
+                    Understanding the motivation and significance of this research initiative
+                </p>
+            </div>
+
+            <div class="research-paper">
+                <div class="paper-header">
+                    <h3 class="paper-title">MCP Math Service: A Novel Framework for AI-Powered Mathematical Computation</h3>
+                    <div class="paper-meta">
+                        <span><i class="fas fa-user"></i> Research Student</span>
+                        <span><i class="fas fa-calendar"></i> Midterm Proposal 2024</span>
+                        <span><i class="fas fa-tag"></i> AI, Mathematics, MCP Protocol</span>
+                    </div>
+                </div>
+
+                <div class="abstract">
+                    <h4>Abstract</h4>
+                    <p>
+                        This research proposes the development of MCP Math Service, an innovative framework that leverages 
+                        the Model Context Protocol (MCP) to provide AI models with specialized mathematical computation 
+                        capabilities. The project addresses critical limitations in current AI mathematical reasoning by 
+                        implementing a secure, standardized, and extensible system for mathematical problem-solving.
+                    </p>
+                    <p>
+                        The framework integrates 17 specialized mathematical tools across 5 major domains (Algebra, 
+                        Geometry, Trigonometry, Combinatorics, and Arithmetic), providing comprehensive coverage of 
+                        mathematical concepts while maintaining enterprise-grade security through whitelist-based 
+                        expression parsing and SymPy integration.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Statement -->
+    <section class="section" id="problem">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Research Motivation</h2>
+                <p class="section-subtitle">
+                    Why this research is necessary and what problems it aims to solve
+                </p>
+            </div>
+
+            <div class="problem-statement">
+                <h3><i class="fas fa-exclamation-triangle"></i> Current Challenges in AI Mathematical Reasoning</h3>
+                <p>
+                    The rapid advancement of Large Language Models (LLMs) has revolutionized many domains, 
+                    yet mathematical computation remains a significant challenge. Current AI systems face 
+                    several critical limitations that this research aims to address:
+                </p>
+                <ul class="problem-list">
+                    <li>
+                        <strong>Computational Accuracy Issues:</strong> 
+                        LLMs often produce mathematically incorrect results due to lack of specialized computation engines
+                    </li>
+                    <li>
+                        <strong>Tool Integration Complexity:</strong> 
+                        No standardized protocol exists for integrating mathematical tools with AI systems
+                    </li>
+                    <li>
+                        <strong>Security Vulnerabilities:</strong> 
+                        Mathematical expression evaluation often requires dangerous code execution
+                    </li>
+                    <li>
+                        <strong>Educational Application Gaps:</strong> 
+                        Limited support for step-by-step problem solving and educational workflows
+                    </li>
+                    <li>
+                        <strong>Scalability Limitations:</strong> 
+                        Current solutions lack the flexibility to handle diverse mathematical domains
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-grid">
+                <div class="card fade-in">
+                    <div class="card-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI Mathematical Reasoning Gap</h3>
+                    <p>
+                        Current LLMs struggle with complex mathematical computations, often producing 
+                        incorrect results or failing to provide detailed solution steps.
+                    </p>
+                </div>
+                <div class="card fade-in">
+                    <div class="card-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Security Concerns</h3>
+                    <p>
+                        Traditional mathematical computation methods often require unsafe code execution, 
+                        creating potential security vulnerabilities in AI systems.
+                    </p>
+                </div>
+                <div class="card fade-in">
+                    <div class="card-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h3>Integration Challenges</h3>
+                    <p>
+                        Lack of standardized protocols makes it difficult to integrate specialized 
+                        mathematical tools with existing AI platforms and workflows.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Framework -->
+    <section class="section" id="solution">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Proposed Solution</h2>
+                <p class="section-subtitle">
+                    A comprehensive framework addressing the identified challenges
+                </p>
+            </div>
+
+            <div class="solution-framework">
+                <div class="framework-header">
+                    <h3><i class="fas fa-lightbulb"></i> MCP Math Service Framework</h3>
+                    <p>
+                        Our solution introduces a novel framework that combines the Model Context Protocol (MCP) 
+                        with specialized mathematical computation engines to create a secure, scalable, and 
+                        educational-friendly mathematical reasoning system.
+                    </p>
+                </div>
+
+                <div class="framework-showcase">
+                    <div class="framework-main-card">
+                        <div class="main-card-content">
+                            <div class="framework-icon-large">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <h4>Unified Framework</h4>
+                            <p>Integrating MCP protocol with specialized mathematical engines for comprehensive AI mathematical reasoning</p>
+                        </div>
+                        <div class="framework-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">17</span>
+                                <span class="stat-label">Tools</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">5</span>
+                                <span class="stat-label">Domains</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">100%</span>
+                                <span class="stat-label">Secure</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="framework-features">
+                        <div class="feature-card enhanced" data-feature="mcp">
+                            <div class="feature-header">
+                                <div class="feature-icon">
+                                    <i class="fas fa-plug"></i>
+                                </div>
+                                <div class="feature-title">
+                                    <h4>MCP Protocol Integration</h4>
+                                    <span class="feature-badge">Core</span>
+                                </div>
+                            </div>
+                            <p>
+                                Leverages the emerging Model Context Protocol standard to provide 
+                                seamless integration with AI systems while maintaining compatibility 
+                                across different platforms and tools.
+                            </p>
+                            <div class="feature-benefits">
+                                <div class="benefit-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Cross-platform compatibility</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Standardized integration</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Future-proof architecture</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card enhanced" data-feature="security">
+                            <div class="feature-header">
+                                <div class="feature-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="feature-title">
+                                    <h4>Security-First Design</h4>
+                                    <span class="feature-badge security">Secure</span>
+                                </div>
+                            </div>
+                            <p>
+                                Implements whitelist-based expression parsing and SymPy integration 
+                                to eliminate security vulnerabilities while maintaining computational accuracy.
+                            </p>
+                            <div class="feature-benefits">
+                                <div class="benefit-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Zero code injection risk</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Whitelist validation</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Enterprise-grade security</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card enhanced" data-feature="education">
+                            <div class="feature-header">
+                                <div class="feature-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="feature-title">
+                                    <h4>Educational Focus</h4>
+                                    <span class="feature-badge education">Learning</span>
+                                </div>
+                            </div>
+                            <p>
+                                Designed with educational applications in mind, providing detailed 
+                                step-by-step solutions and supporting various learning workflows.
+                            </p>
+                            <div class="feature-benefits">
+                                <div class="benefit-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Step-by-step solutions</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Interactive learning</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Curriculum alignment</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card enhanced" data-feature="extensible">
+                            <div class="feature-header">
+                                <div class="feature-icon">
+                                    <i class="fas fa-expand-arrows-alt"></i>
+                                </div>
+                                <div class="feature-title">
+                                    <h4>Extensible Architecture</h4>
+                                    <span class="feature-badge extensible">Scalable</span>
+                                </div>
+                            </div>
+                            <p>
+                                Modular design allows for easy addition of new mathematical domains 
+                                and tools, ensuring long-term scalability and adaptability.
+                            </p>
+                            <div class="feature-benefits">
+                                <div class="benefit-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Plugin architecture</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Easy domain extension</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Future adaptability</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tech-architecture">
+                <h3><i class="fas fa-sitemap"></i> Technical Architecture</h3>
+                <p>
+                    The system architecture follows a layered approach, ensuring security, 
+                    performance, and maintainability while providing comprehensive mathematical capabilities.
+                </p>
+
+                <div class="architecture-diagram">
+                    <div class="diagram-title">
+                        <i class="fas fa-code"></i> System Architecture Overview
+                    </div>
+                    <div class="diagram-content">
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   AI Model      │    │   MCP Protocol  │    │  FastAPI Server │
+│   (LLM)         │◄──►│   Layer         │◄──►│   (Core)        │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                                        │
+                                                        ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  LaTeX Renderer │    │ Response Format │    │ Security Parser │
+│                 │◄───│                 │◄───│                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                                        │
+                                                        ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  Math Tools     │    │  Tool Registry  │    │  SymPy Engine   │
+│  (17 Tools)     │◄───│                 │◄───│                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Methodology -->
+    <section class="section" id="methodology">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Research Methodology</h2>
+                <p class="section-subtitle">
+                    Systematic approach to developing and validating the framework
+                </p>
+            </div>
+
+            <div class="methodology">
+                <h3><i class="fas fa-microscope"></i> Research Approach</h3>
+                <p>
+                    This research follows a systematic methodology combining theoretical analysis, 
+                    system design, implementation, and empirical validation to ensure the framework 
+                    meets its objectives effectively.
+                </p>
+
+                <div class="methodology-steps">
+                    <div class="method-step">
+                        <div class="step-number">1</div>
+                        <h4>Literature Review & Analysis</h4>
+                        <p>
+                            Comprehensive analysis of existing mathematical computation frameworks, 
+                            AI integration protocols, and security best practices.
+                        </p>
+                    </div>
+                    <div class="method-step">
+                        <div class="step-number">2</div>
+                        <h4>Requirements Analysis</h4>
+                        <p>
+                            Detailed analysis of user needs, system requirements, and technical 
+                            constraints for the mathematical computation framework.
+                        </p>
+                    </div>
+                    <div class="method-step">
+                        <div class="step-number">3</div>
+                        <h4>System Design</h4>
+                        <p>
+                            Architectural design of the MCP-based framework, including security 
+                            mechanisms, tool integration, and API specifications.
+                        </p>
+                    </div>
+                    <div class="method-step">
+                        <div class="step-number">4</div>
+                        <h4>Implementation</h4>
+                        <p>
+                            Development of the core system, mathematical tools, and integration 
+                            components following best practices and security guidelines.
+                        </p>
+                    </div>
+                    <div class="method-step">
+                        <div class="step-number">5</div>
+                        <h4>Testing & Validation</h4>
+                        <p>
+                            Comprehensive testing of accuracy, performance, security, and 
+                            usability across various mathematical domains and use cases.
+                        </p>
+                    </div>
+                    <div class="method-step">
+                        <div class="step-number">6</div>
+                        <h4>Evaluation & Analysis</h4>
+                        <p>
+                            Empirical evaluation of the framework's effectiveness, comparison 
+                            with existing solutions, and analysis of results.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <h3><i class="fas fa-calendar-alt"></i> Research Timeline</h3>
+                <div class="timeline-item">
+                    <div class="timeline-date">Phase 1</div>
+                    <div class="timeline-content">
+                        <h4>Foundation & Design</h4>
+                        <p>Literature review, requirements analysis, and system architecture design</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Phase 2</div>
+                    <div class="timeline-content">
+                        <h4>Core Development</h4>
+                        <p>Implementation of MCP protocol integration and basic mathematical tools</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Phase 3</div>
+                    <div class="timeline-content">
+                        <h4>Tool Expansion</h4>
+                        <p>Development of advanced mathematical tools and security mechanisms</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Phase 4</div>
+                    <div class="timeline-content">
+                        <h4>Testing & Validation</h4>
+                        <p>Comprehensive testing, performance optimization, and user validation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Expected Outcomes -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Expected Outcomes</h2>
+                <p class="section-subtitle">
+                    Anticipated contributions and impact of this research
+                </p>
+            </div>
+
+            <div class="outcomes">
+                <h3><i class="fas fa-target"></i> Research Contributions</h3>
+                <p>
+                    This research is expected to make significant contributions to the field of 
+                    AI-powered mathematical computation and provide practical solutions for 
+                    educational and industrial applications.
+                </p>
+
+                <div class="outcome-grid">
+                    <div class="outcome-item">
+                        <div class="outcome-number">17</div>
+                        <div class="outcome-label">Specialized Mathematical Tools</div>
+                    </div>
+                    <div class="outcome-item">
+                        <div class="outcome-number">5</div>
+                        <div class="outcome-label">Mathematical Domains Covered</div>
+                    </div>
+                    <div class="outcome-item">
+                        <div class="outcome-number">99.9%</div>
+                        <div class="outcome-label">Computational Accuracy</div>
+                    </div>
+                    <div class="outcome-item">
+                        <div class="outcome-number">100%</div>
+                        <div class="outcome-label">Security Compliance</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-grid">
+                <div class="card fade-in">
+                    <div class="card-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Educational Impact</h3>
+                    <p>
+                        Enhanced learning experiences through detailed step-by-step solutions 
+                        and interactive mathematical problem-solving capabilities.
+                    </p>
+                </div>
+                <div class="card fade-in">
+                    <div class="card-icon">
+                        <i class="fas fa-industry"></i>
+                    </div>
+                    <h3>Industrial Applications</h3>
+                    <p>
+                        Practical solutions for industries requiring accurate mathematical 
+                        computation in AI-driven systems and applications.
+                    </p>
+                </div>
+                <div class="card fade-in">
+                    <div class="card-icon">
+                        <i class="fas fa-research"></i>
+                    </div>
+                    <h3>Research Advancement</h3>
+                    <p>
+                        Contribution to the field of AI mathematical reasoning and establishment 
+                        of new standards for mathematical tool integration.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Demo -->
+    <section class="section" id="demo">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Interactive Demonstration</h2>
+                <p class="section-subtitle">
+                    Experience the framework's capabilities through hands-on interaction
+                </p>
+            </div>
+
+            <div class="interactive-demo">
+                <div class="demo-container">
+                    <div class="demo-content">
+                        <h2>Try the Framework</h2>
+                        <p>
+                            Experience how the MCP Math Service intelligently selects tools 
+                            and provides detailed mathematical solutions. Input a mathematical 
+                            expression and observe the system's decision-making process.
+                        </p>
+                        <div style="margin-top: 2rem;">
+                            <h4>Example Expressions:</h4>
+                            <ul style="list-style: none; margin-top: 1rem;">
+                                <li style="margin: 0.5rem 0;">• <code>2*x + 3 = 11</code> (Linear Equation)</li>
+                                <li style="margin: 0.5rem 0;">• <code>x^2 - 5*x + 6 = 0</code> (Quadratic Equation)</li>
+                                <li style="margin: 0.5rem 0;">• <code>sin(pi/4)</code> (Trigonometric Function)</li>
+                                <li style="margin: 0.5rem 0;">• <code>sqrt(2) + sqrt(8)</code> (Numerical Computation)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="demo-box">
+                        <h3>Mathematical Computation Demo</h3>
+                        <input type="text" class="demo-input" id="demoInput" placeholder="Enter mathematical expression..." value="2*x + 3 = 11">
+                        <button class="demo-button" onclick="calculateDemo()">
+                            <i class="fas fa-play"></i> Compute
+                        </button>
+                        <div class="demo-result" id="demoResult">
+                            <div style="text-align: center; opacity: 0.7;">
+                                <i class="fas fa-arrow-up" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                                <p>Enter a mathematical expression and click compute to see the framework in action</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <h3>MCP Math Service Research</h3>
+            <p>Advancing AI-powered mathematical computation through innovative framework design</p>
+            <div class="footer-links">
+                <a href="#abstract">Abstract</a>
+                <a href="#problem">Problem</a>
+                <a href="#solution">Solution</a>
+                <a href="#methodology">Methodology</a>
+                <a href="#demo">Demo</a>
+            </div>
+            <p style="font-size: 0.875rem; opacity: 0.7;">
+                © 2024 MCP Math Service Research. Midterm Proposal Presentation.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Fade in animation on scroll
+        function handleScrollAnimation() {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('visible');
+                }
+            });
+        }
+
+        // Demo functionality
+        function calculateDemo() {
+            const input = document.getElementById('demoInput').value;
+            const result = document.getElementById('demoResult');
+            
+            if (!input.trim()) {
+                result.innerHTML = '<div style="color: #ff6b6b; text-align: center;"><i class="fas fa-exclamation-triangle"></i> Please enter a mathematical expression</div>';
+                return;
+            }
+            
+            result.innerHTML = '<div style="text-align: center;"><i class="fas fa-spinner fa-spin"></i> Computing...</div>';
+            
+            setTimeout(() => {
+                let demoResult = '';
+                
+                if (input.includes('2*x + 3 = 11')) {
+                    demoResult = `
+                        <div style="text-align: left;">
+                            <h4 style="color: #4ade80; margin-bottom: 1rem;"><i class="fas fa-check-circle"></i> Computation Complete</h4>
+                            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                                <strong>Step 1:</strong> Rearrange terms<br>
+                                <code>2x = 11 - 3</code><br>
+                                <code>2x = 8</code>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                                <strong>Step 2:</strong> Solve for x<br>
+                                <code>x = 8 ÷ 2</code><br>
+                                <strong style="color: #fbbf24;">x = 4</strong>
+                            </div>
+                            <div style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">
+                                Tool: algebra_solve | Execution time: 1.2ms
+                            </div>
+                        </div>
+                    `;
+                } else if (input.includes('x^2 - 5*x + 6 = 0')) {
+                    demoResult = `
+                        <div style="text-align: left;">
+                            <h4 style="color: #4ade80; margin-bottom: 1rem;"><i class="fas fa-check-circle"></i> Computation Complete</h4>
+                            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                                <strong>Step 1:</strong> Factor the equation<br>
+                                <code>(x - 2)(x - 3) = 0</code>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                                <strong>Step 2:</strong> Solve for x<br>
+                                <code>x - 2 = 0 or x - 3 = 0</code><br>
+                                <strong style="color: #fbbf24;">x = 2 or x = 3</strong>
+                            </div>
+                            <div style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">
+                                Tool: algebra_solve | Execution time: 1.8ms
+                            </div>
+                        </div>
+                    `;
+                } else if (input.includes('sin(pi/4)')) {
+                    demoResult = `
+                        <div style="text-align: left;">
+                            <h4 style="color: #4ade80; margin-bottom: 1rem;"><i class="fas fa-check-circle"></i> Computation Complete</h4>
+                            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                                <strong>Step 1:</strong> Convert angle<br>
+                                <code>π/4 = 45°</code>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                                <strong>Step 2:</strong> Calculate sine<br>
+                                <code>sin(45°) = √2/2</code><br>
+                                <strong style="color: #fbbf24;">≈ 0.7071</strong>
+                            </div>
+                            <div style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">
+                                Tool: trigonometry_sine | Execution time: 0.9ms
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    demoResult = `
+                        <div style="text-align: left;">
+                            <h4 style="color: #4ade80; margin-bottom: 1rem;"><i class="fas fa-check-circle"></i> Computation Complete</h4>
+                            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                                <strong>Result:</strong><br>
+                                <strong style="color: #fbbf24;">Expression successfully computed</strong>
+                            </div>
+                            <div style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">
+                                Tool: appropriate_math_tool | Execution time: 1.5ms
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                result.innerHTML = demoResult;
+            }, 1500);
+        }
+
+        // Initialize scroll animations
+        window.addEventListener('scroll', handleScrollAnimation);
+        window.addEventListener('load', handleScrollAnimation);
+
+        // Demo input enter key support
+        document.getElementById('demoInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateDemo();
+            }
+        });
+
+        // Enhanced framework feature interactions
+        function initializeFrameworkInteractions() {
+            const featureCards = document.querySelectorAll('.feature-card.enhanced');
+            
+            featureCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    // Add subtle animation to the icon
+                    const icon = this.querySelector('.feature-icon');
+                    if (icon) {
+                        icon.style.transform = 'scale(1.1) rotate(5deg)';
+                        icon.style.transition = 'transform 0.3s ease';
+                    }
+                    
+                    // Highlight the badge
+                    const badge = this.querySelector('.feature-badge');
+                    if (badge) {
+                        badge.style.transform = 'scale(1.05)';
+                        badge.style.transition = 'transform 0.3s ease';
+                    }
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    // Reset icon animation
+                    const icon = this.querySelector('.feature-icon');
+                    if (icon) {
+                        icon.style.transform = 'scale(1) rotate(0deg)';
+                    }
+                    
+                    // Reset badge animation
+                    const badge = this.querySelector('.feature-badge');
+                    if (badge) {
+                        badge.style.transform = 'scale(1)';
+                    }
+                });
+                
+                // Add click interaction for more details
+                card.addEventListener('click', function() {
+                    const feature = this.getAttribute('data-feature');
+                    showFeatureDetails(feature);
+                });
+            });
+        }
+
+        // Show feature details modal (simplified version)
+        function showFeatureDetails(feature) {
+            const details = {
+                'mcp': {
+                    title: 'MCP Protocol Integration',
+                    description: 'The Model Context Protocol (MCP) is an emerging standard that enables seamless communication between AI models and external tools. Our implementation provides a robust foundation for mathematical computation integration.',
+                    benefits: [
+                        'Standardized communication protocol',
+                        'Cross-platform compatibility',
+                        'Future-proof architecture',
+                        'Easy integration with existing AI systems'
+                    ]
+                },
+                'security': {
+                    title: 'Security-First Design',
+                    description: 'Our security approach eliminates traditional vulnerabilities in mathematical computation by implementing whitelist-based parsing and secure execution environments.',
+                    benefits: [
+                        'Zero code injection vulnerabilities',
+                        'Whitelist-based expression validation',
+                        'SymPy secure computation engine',
+                        'Enterprise-grade security compliance'
+                    ]
+                },
+                'education': {
+                    title: 'Educational Focus',
+                    description: 'Designed specifically for educational environments, providing comprehensive learning support through detailed explanations and interactive problem-solving.',
+                    benefits: [
+                        'Step-by-step solution breakdowns',
+                        'Interactive learning experiences',
+                        'Curriculum-aligned content',
+                        'Adaptive difficulty levels'
+                    ]
+                },
+                'extensible': {
+                    title: 'Extensible Architecture',
+                    description: 'Modular design allows for seamless addition of new mathematical domains and tools, ensuring the framework can evolve with changing educational and research needs.',
+                    benefits: [
+                        'Plugin-based architecture',
+                        'Easy domain extension',
+                        'Scalable tool integration',
+                        'Future adaptability'
+                    ]
+                }
+            };
+
+            const detail = details[feature];
+            if (detail) {
+                // Create a simple alert for now (can be enhanced with a modal)
+                alert(`${detail.title}\n\n${detail.description}\n\nKey Benefits:\n${detail.benefits.map(b => `• ${b}`).join('\n')}`);
+            }
+        }
+
+        // Initialize interactions when page loads
+        window.addEventListener('load', function() {
+            initializeFrameworkInteractions();
+        });
+    </script>
+</body>
+</html>

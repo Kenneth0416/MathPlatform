@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "math-service": {
+      "command": "python3",
+      "args": [
+        "-m",
+        "mcp_math.mcp_server"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/kenneth/Documents/MCP/MathMCP"
+      }
+    }
+  }
+}
+
+

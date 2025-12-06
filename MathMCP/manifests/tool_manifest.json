@@ -1,0 +1,339 @@
+{
+  "schema_version": "1.0",
+  "name": "MCP Math Service",
+  "version": "0.1.0",
+  "description": "本地可运行的 MCP 风格数学问题求解服务，覆盖初中数学常见题型",
+  "base_url": "http://localhost:8000",
+  "tools": [
+    {
+      "name": "algebra.solve",
+      "description": "解一元一次或二次方程，支持因式分解和求根公式",
+      "endpoint": "/algebra/solve",
+      "method": "POST",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "eq": {
+            "type": "string",
+            "description": "方程表达式，如 '2x+3=11' 或 'x^2-5x+6=0'"
+          },
+          "var": {
+            "type": "string",
+            "description": "变量名，默认为 x",
+            "default": "x"
+          },
+          "method": {
+            "type": "string",
+            "enum": ["auto", "quadratic_formula", "factor"],
+            "description": "求解方法",
+            "default": "auto"
+          },
+          "detail": {
+            "type": "string",
+            "enum": ["short", "full"],
+            "description": "详细程度",
+            "default": "short"
+          },
+          "exact": {
+            "type": "boolean",
+            "description": "是否返回精确结果",
+            "default": true
+          },
+          "decimals": {
+            "type": "integer",
+            "description": "小数位数",
+            "default": 4
+          }
+        },
+        "required": ["eq"]
+      }
+    },
+    {
+      "name": "algebra.simplify",
+      "description": "化简代数表达式，合并同类项",
+      "endpoint": "/algebra/simplify",
+      "method": "POST",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "expr": {
+            "type": "string",
+            "description": "要化简的表达式，如 '2*x + 3*x'"
+          },
+          "detail": {
+            "type": "string",
+            "enum": ["short", "full"],
+            "default": "short"
+          },
+          "exact": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": ["expr"]
+      }
+    },
+    {
+      "name": "algebra.expand",
+      "description": "展开代数表达式",
+      "endpoint": "/algebra/expand",
+      "method": "POST",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "expr": {
+            "type": "string",
+            "description": "要展开的表达式，如 '(x+1)*(x+2)'"
+          },
+          "detail": {
+            "type": "string",
+            "enum": ["short", "full"],
+            "default": "short"
+          }
+        },
+        "required": ["expr"]
+      }
+    },
+    {
+      "name": "algebra.factor",
+      "description": "因式分解",
+      "endpoint": "/algebra/factor",
+      "method": "POST",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "expr": {
+            "type": "string",
+            "description": "要分解的表达式，如 'x^2-1'"
+          },
+          "detail": {
+            "type": "string",
+            "enum": ["short", "full"],
+            "default": "short"
+          }
+        },
+        "required": ["expr"]
+      }
+    },
+    {
+      "name": "arithmetic.fraction",
+      "description": "分数四则运算（加减乘除）",
+      "endpoint": "/arithmetic/fraction",
+      "method": "POST",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "a": {
+            "type": "string",
+            "description": "第一个数（分数形式如 '3/4' 或整数）"
+          },
+          "b": {
+            "type": "string",
+            "description": "第二个数"
+          },
+          "op": {
+            "type": "string",
+            "enum": ["+", "-", "*", "/"],
+            "description": "运算符"
+          },
+          "detail": {
+            "type": "string",
+            "enum": ["short", "full"],
+            "default": "short"
+          }
+        },
+        "required": ["a", "b", "op"]
+      }
+    },
+    {
+      "name": "arithmetic.percent",
+      "description": "百分比增长或减少计算",
+      "endpoint": "/arithmetic/percent",
+      "method": "POST",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "base": {
+            "type": "number",
+            "description": "基数"
+          },
+          "rate": {
+            "type": "number",
+            "description": "百分比率（如 20 表示 20%）"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["increase", "decrease"],
+            "description": "增长或减少"
+          },
+          "decimals": {
+            "type": "integer",
+            "default": 4
+          }
+        },
+        "required": ["base", "rate", "mode"]
+      }
+    },
+    {
+      "name": "geometry.pythagoras",
+      "description": "勾股定理计算（已知两边求第三边）",
+      "endpoint": "/geometry/pythagoras",
+      "method": "POST",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "known": {
+            "type": "string",
+            "enum": ["legs", "hypotenuse"],
+            "description": "已知条件：legs=已知两直角边求斜边，hypotenuse=已知斜边和一直角边求另一直角边"
+          },
+          "a": {
+            "type": "number",
+            "description": "直角边 a"
+          },
+          "b": {
+            "type": "number",
+            "description": "直角边 b"
+          },
+          "c": {
+            "type": "number",
+            "description": "斜边 c"
+          },
+          "detail": {
+            "type": "string",
+            "enum": ["short", "full"],
+            "default": "short"
+          }
+        },
+        "required": ["known"]
+      }
+    },
+    {
+      "name": "geometry.similar",
+      "description": "相似三角形比例计算，求未知边",
+      "endpoint": "/geometry/similar",
+      "method": "POST",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tri1": {
+            "type": "object",
+            "description": "三角形1的边，如 {\"AB\": 3, \"BC\": 4, \"CA\": 5}"
+          },
+          "tri2": {
+            "type": "object",
+            "description": "三角形2的边，未知边用 null"
+          },
+          "mapping": {
+            "type": "object",
+            "description": "顶点对应关系，如 {\"A\": \"D\", \"B\": \"E\", \"C\": \"F\"}"
+          },
+          "query": {
+            "type": "string",
+            "description": "要求的边名称"
+          },
+          "detail": {
+            "type": "string",
+            "enum": ["short", "full"],
+            "default": "short"
+          }
+        },
+        "required": ["tri1", "tri2", "mapping", "query"]
+      }
+    },
+    {
+      "name": "geometry.circle_angles",
+      "description": "圆心角与圆周角关系计算（同弧）",
+      "endpoint": "/geometry/circle_angles",
+      "method": "POST",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "center_angle": {
+            "type": "number",
+            "description": "圆心角度数"
+          },
+          "inscribed_angle": {
+            "type": "number",
+            "description": "圆周角度数"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["deg", "rad"],
+            "default": "deg"
+          },
+          "query": {
+            "type": "string",
+            "enum": ["center", "inscribed"],
+            "description": "查询圆心角还是圆周角"
+          }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "combinatorics.ncr",
+      "description": "组合数 C(n,r) 计算",
+      "endpoint": "/combinatorics/ncr",
+      "method": "POST",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "type": "integer",
+            "description": "总数"
+          },
+          "r": {
+            "type": "integer",
+            "description": "选择数"
+          }
+        },
+        "required": ["n", "r"]
+      }
+    },
+    {
+      "name": "combinatorics.npr",
+      "description": "排列数 P(n,r) 计算",
+      "endpoint": "/combinatorics/npr",
+      "method": "POST",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "type": "integer",
+            "description": "总数"
+          },
+          "r": {
+            "type": "integer",
+            "description": "选择数"
+          }
+        },
+        "required": ["n", "r"]
+      }
+    },
+    {
+      "name": "eval.numeric",
+      "description": "安全的数值表达式求值",
+      "endpoint": "/eval/numeric",
+      "method": "POST",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "expr": {
+            "type": "string",
+            "description": "数学表达式，如 'sqrt(2) + pi'"
+          },
+          "precision": {
+            "type": "integer",
+            "description": "精度",
+            "default": 10
+          }
+        },
+        "required": ["expr"]
+      }
+    }
+  ]
+}
+
+
+

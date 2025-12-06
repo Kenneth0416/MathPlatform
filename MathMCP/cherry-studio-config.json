@@ -1,0 +1,289 @@
+{
+  "name": "MCP Math Service",
+  "version": "0.1.0",
+  "description": "数学问题求解服务 - 覆盖初中数学常见题型",
+  "base_url": "http://localhost:8000",
+  "authentication": {
+    "type": "none"
+  },
+  "tools": [
+    {
+      "name": "解方程",
+      "id": "algebra_solve",
+      "description": "解一元一次或二次方程，支持因式分解和求根公式。示例：2x+3=11 或 x²-5x+6=0",
+      "endpoint": "/algebra/solve",
+      "method": "POST",
+      "parameters": {
+        "eq": {
+          "type": "string",
+          "required": true,
+          "description": "方程表达式"
+        },
+        "var": {
+          "type": "string",
+          "required": false,
+          "default": "x",
+          "description": "变量名"
+        },
+        "detail": {
+          "type": "string",
+          "required": false,
+          "default": "full",
+          "enum": ["short", "full"],
+          "description": "详细程度"
+        }
+      }
+    },
+    {
+      "name": "化简表达式",
+      "id": "algebra_simplify",
+      "description": "化简代数表达式，合并同类项。示例：2*x + 3*x → 5*x",
+      "endpoint": "/algebra/simplify",
+      "method": "POST",
+      "parameters": {
+        "expr": {
+          "type": "string",
+          "required": true,
+          "description": "要化简的表达式"
+        },
+        "detail": {
+          "type": "string",
+          "required": false,
+          "default": "short",
+          "enum": ["short", "full"],
+          "description": "详细程度"
+        }
+      }
+    },
+    {
+      "name": "展开表达式",
+      "id": "algebra_expand",
+      "description": "展开代数表达式。示例：(x+1)*(x+2) → x²+3x+2",
+      "endpoint": "/algebra/expand",
+      "method": "POST",
+      "parameters": {
+        "expr": {
+          "type": "string",
+          "required": true,
+          "description": "要展开的表达式"
+        },
+        "detail": {
+          "type": "string",
+          "required": false,
+          "default": "short",
+          "enum": ["short", "full"],
+          "description": "详细程度"
+        }
+      }
+    },
+    {
+      "name": "因式分解",
+      "id": "algebra_factor",
+      "description": "对多项式进行因式分解。示例：x²-1 → (x-1)(x+1)",
+      "endpoint": "/algebra/factor",
+      "method": "POST",
+      "parameters": {
+        "expr": {
+          "type": "string",
+          "required": true,
+          "description": "要分解的表达式"
+        },
+        "detail": {
+          "type": "string",
+          "required": false,
+          "default": "short",
+          "enum": ["short", "full"],
+          "description": "详细程度"
+        }
+      }
+    },
+    {
+      "name": "分数运算",
+      "id": "arithmetic_fraction",
+      "description": "分数的加减乘除运算，自动通分和约分。示例：3/4 + 5/6",
+      "endpoint": "/arithmetic/fraction",
+      "method": "POST",
+      "parameters": {
+        "a": {
+          "type": "string",
+          "required": true,
+          "description": "第一个分数（如 3/4）"
+        },
+        "b": {
+          "type": "string",
+          "required": true,
+          "description": "第二个分数（如 5/6）"
+        },
+        "op": {
+          "type": "string",
+          "required": true,
+          "enum": ["+", "-", "*", "/"],
+          "description": "运算符"
+        },
+        "detail": {
+          "type": "string",
+          "required": false,
+          "default": "full",
+          "enum": ["short", "full"],
+          "description": "详细程度"
+        }
+      }
+    },
+    {
+      "name": "百分比计算",
+      "id": "arithmetic_percent",
+      "description": "计算百分比增长或减少。示例：100 增长 20%",
+      "endpoint": "/arithmetic/percent",
+      "method": "POST",
+      "parameters": {
+        "base": {
+          "type": "number",
+          "required": true,
+          "description": "基数"
+        },
+        "rate": {
+          "type": "number",
+          "required": true,
+          "description": "百分比率（如 20 表示 20%）"
+        },
+        "mode": {
+          "type": "string",
+          "required": true,
+          "enum": ["increase", "decrease"],
+          "description": "增长或减少"
+        }
+      }
+    },
+    {
+      "name": "勾股定理",
+      "id": "geometry_pythagoras",
+      "description": "根据勾股定理计算三角形边长。可求斜边或直角边",
+      "endpoint": "/geometry/pythagoras",
+      "method": "POST",
+      "parameters": {
+        "known": {
+          "type": "string",
+          "required": true,
+          "enum": ["legs", "hypotenuse"],
+          "description": "已知条件：legs=两直角边，hypotenuse=斜边和一直角边"
+        },
+        "a": {
+          "type": "number",
+          "required": false,
+          "description": "直角边 a"
+        },
+        "b": {
+          "type": "number",
+          "required": false,
+          "description": "直角边 b"
+        },
+        "c": {
+          "type": "number",
+          "required": false,
+          "description": "斜边 c"
+        },
+        "detail": {
+          "type": "string",
+          "required": false,
+          "default": "full",
+          "enum": ["short", "full"],
+          "description": "详细程度"
+        }
+      }
+    },
+    {
+      "name": "圆心角圆周角",
+      "id": "geometry_circle_angles",
+      "description": "计算同弧所对的圆心角和圆周角关系（圆周角=圆心角÷2）",
+      "endpoint": "/geometry/circle_angles",
+      "method": "POST",
+      "parameters": {
+        "center_angle": {
+          "type": "number",
+          "required": false,
+          "description": "圆心角度数"
+        },
+        "inscribed_angle": {
+          "type": "number",
+          "required": false,
+          "description": "圆周角度数"
+        },
+        "query": {
+          "type": "string",
+          "required": true,
+          "enum": ["center", "inscribed"],
+          "description": "要查询的角：center=圆心角，inscribed=圆周角"
+        }
+      }
+    },
+    {
+      "name": "组合数",
+      "id": "combinatorics_ncr",
+      "description": "计算组合数 C(n,r)，从 n 个元素中选 r 个的组合方式数",
+      "endpoint": "/combinatorics/ncr",
+      "method": "POST",
+      "parameters": {
+        "n": {
+          "type": "integer",
+          "required": true,
+          "description": "总数"
+        },
+        "r": {
+          "type": "integer",
+          "required": true,
+          "description": "选择数"
+        }
+      }
+    },
+    {
+      "name": "排列数",
+      "id": "combinatorics_npr",
+      "description": "计算排列数 P(n,r)，从 n 个元素中选 r 个的排列方式数",
+      "endpoint": "/combinatorics/npr",
+      "method": "POST",
+      "parameters": {
+        "n": {
+          "type": "integer",
+          "required": true,
+          "description": "总数"
+        },
+        "r": {
+          "type": "integer",
+          "required": true,
+          "description": "选择数"
+        }
+      }
+    },
+    {
+      "name": "数值计算",
+      "id": "eval_numeric",
+      "description": "安全地计算数学表达式的数值。支持常用函数：sqrt, sin, cos, pi 等",
+      "endpoint": "/eval/numeric",
+      "method": "POST",
+      "parameters": {
+        "expr": {
+          "type": "string",
+          "required": true,
+          "description": "数学表达式，如 sqrt(2) + pi"
+        },
+        "precision": {
+          "type": "integer",
+          "required": false,
+          "default": 10,
+          "description": "计算精度"
+        }
+      }
+    }
+  ],
+  "system_prompt": "你是一个专业的数学辅导助手，可以使用 MCP Math Service 的工具来帮助学生解决初中数学问题。\n\n使用工具时：\n1. 优先使用工具进行计算，不要自己猜测答案\n2. 学习场景使用 detail=\"full\" 显示完整步骤\n3. 获得结果后，用通俗易懂的语言向学生解释\n4. 引导学生理解解题思路，而不只是给答案\n5. 必要时可以连续使用多个工具\n\n表达式格式：\n- 幂次用 ** 或 ^ (如 x**2)\n- 乘法用 * (如 2*x)\n- 分数用 / (如 3/4)\n\n记住：你的目标是帮助学生理解和学习，而不仅仅是提供答案。",
+  "usage_tips": [
+    "对于学习场景，建议使用 detail='full' 参数获取详细步骤",
+    "方程中使用 * 表示乘法，** 表示幂次",
+    "分数用斜杠表示，如 3/4",
+    "可以连续使用多个工具解决复杂问题",
+    "工具返回包含精确结果和近似值"
+  ]
+}
+
+
+

@@ -4,16 +4,19 @@ import { Home, MessageSquare, BookOpen, User } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/lib/i18n-context"
 
-const navItems = [
-  { href: "/", icon: Home, label: "社群" },
-  { href: "/chatbot", icon: MessageSquare, label: "AI助手" },
-  { href: "/tutorials", icon: BookOpen, label: "教程" },
-  { href: "/profile", icon: User, label: "我的" },
+const getNavItems = (t: (key: string) => string) => [
+  { href: "/", icon: Home, label: t('nav.community') },
+  { href: "/chatbot", icon: MessageSquare, label: t('nav.aiAssistant') },
+  { href: "/tutorials", icon: BookOpen, label: t('nav.tutorials') },
+  { href: "/profile", icon: User, label: t('nav.profile') },
 ]
 
 export function MobileNav() {
   const pathname = usePathname()
+  const { t } = useI18n()
+  const navItems = getNavItems(t)
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border">

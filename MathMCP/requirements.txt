@@ -1,0 +1,22 @@
+# MCP Math Service 依赖包
+
+# Web 框架
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic>=2.5.0
+
+# 数学计算
+sympy==1.12
+
+# HTTP 客户端（用于演示客户端）
+requests==2.31.0
+
+# 测试
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# 开发工具（可选）
+# black==23.11.0
+# flake8==6.1.0
+# mypy==1.7.0
+

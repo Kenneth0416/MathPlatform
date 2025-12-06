@@ -1,0 +1,175 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  username    String   @unique
+  password    String
+  avatar      String?
+  bio         String?
+
+  // User preferences
+  language    String   @default("zh-TW") // zh-TW, zh-CN, en
+  notifications Boolean @default(true)
+  darkMode    Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  conversations Conversation[]
+  userProgress  UserProgress[]
+  achievements  UserAchievement[]
+  sessions      LearningSession[]
+
+  // Stats
+  totalStudyTime Int @default(0) // in minutes
+  totalMessages  Int @default(0)
+  streak         Int @default(0) // consecutive days
+
+  @@map("users")
+}
+
+model Conversation {
+  id         String   @id @default(cuid())
+  title      String
+  userId     String
+  mode       String   // solve, tutor, practice, check, board
+  difficulty String   // K-6, Middle, High, College, Contest
+  language   String   // zh-TW, zh-CN, en
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  // Metadata
+  messageCount Int @default(0)
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  role           String   // user, assistant
+  content        String
+  timestamp      DateTime @default(now())
+
+  // Optional metadata for rich messages (stored as JSON strings)
+  steps          String?  // JSON string
+  knowledgePoints String? // JSON array string
+  visualizations String? // JSON string
+
+  // Relations
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Tutorial {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  category    String   // algebra, geometry, calculus, etc.
+  difficulty  String   // K-6, Middle, High, College, Contest
+  duration    Int      // estimated minutes
+  lessons     Int      // number of lessons
+  rating      Float    @default(0)
+  imageUrl    String?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  progress UserProgress[]
+
+  @@map("tutorials")
+}
+
+model UserProgress {
+  id         String   @id @default(cuid())
+  userId     String
+  tutorialId String
+  completed  Int      @default(0) // completed lessons
+  total      Int      // total lessons
+  percentage Float    @default(0)
+  lastAccess DateTime @default(now())
+  completedAt DateTime?
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tutorial Tutorial @relation(fields: [tutorialId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tutorialId])
+  @@map("user_progress")
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  icon        String
+  category    String   // learning, social, streak, etc.
+  points      Int
+  unlockedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  users UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  // Relations
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model LearningSession {
+  id        String   @id @default(cuid())
+  userId    String
+  startTime DateTime @default(now())
+  endTime   DateTime?
+  duration  Int?     // in minutes
+  mode      String   // solve, tutor, practice, check, board
+  difficulty String
+  messageCount Int @default(0)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("learning_sessions")
+}
+
+model StudyStreak {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  currentStreak Int @default(0)
+  longestStreak  Int @default(0)
+  lastStudyDate  DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("study_streaks")
+}

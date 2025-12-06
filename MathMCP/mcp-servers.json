@@ -1,0 +1,38 @@
+{
+  "mcpServers": {
+    "math-service": {
+      "command": "python3",
+      "args": [
+        "-m",
+        "mcp_math.mcp_server"
+      ],
+      "cwd": "/Users/kenneth/Documents/MCP/MathMCP",
+      "env": {
+        "PYTHONPATH": "/Users/kenneth/Documents/MCP/MathMCP",
+        "PYTHONUNBUFFERED": "1"
+      },
+      "disabled": false,
+      "alwaysAllow": [],
+      "metadata": {
+        "name": "MCP Math Service",
+        "description": "初中数学问题求解服务 - 覆盖代数、算术、几何、组合等题型",
+        "version": "0.1.0",
+        "author": "MCP Math Team",
+        "tools": [
+          "algebra_solve",
+          "algebra_simplify",
+          "algebra_expand",
+          "algebra_factor",
+          "arithmetic_fraction",
+          "arithmetic_percent",
+          "geometry_pythagoras",
+          "geometry_circle_angles",
+          "combinatorics_ncr",
+          "combinatorics_npr",
+          "eval_numeric"
+        ]
+      }
+    }
+  }
+}
+

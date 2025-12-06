@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { PlayCircle, Clock, BookOpen, ChevronRight, Star } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
+import { useI18n } from "@/lib/i18n-context"
 
 interface Tutorial {
   id: number
@@ -119,6 +120,7 @@ const lessonsList: Lesson[] = [
 ]
 
 export default function TutorialsPage() {
+  const { t } = useI18n()
   const [activeTab, setActiveTab] = useState("all")
   const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null)
 
@@ -137,9 +139,22 @@ export default function TutorialsPage() {
     }
   }
 
+  const getDifficultyLabel = (difficulty: string) => {
+    switch (difficulty) {
+      case "初级":
+        return t('tutorials.elementary')
+      case "中级":
+        return t('tutorials.intermediate')
+      case "高级":
+        return t('tutorials.advanced')
+      default:
+        return difficulty
+    }
+  }
+
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden fixed inset-0">
-      <MobileHeader title="教程" />
+      <MobileHeader title={t('tutorials.title')} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="max-w-screen-sm mx-auto w-full">
@@ -149,22 +164,22 @@ export default function TutorialsPage() {
                 <ScrollArea className="w-full">
                   <div className="flex px-4 py-3 gap-2">
                     <TabsTrigger value="all" className="rounded-full">
-                      全部
+                      {t('tutorials.all')}
                     </TabsTrigger>
                     <TabsTrigger value="代数" className="rounded-full whitespace-nowrap">
-                      代数
+                      {t('tutorials.algebra')}
                     </TabsTrigger>
                     <TabsTrigger value="几何" className="rounded-full whitespace-nowrap">
-                      几何
+                      {t('tutorials.geometry')}
                     </TabsTrigger>
                     <TabsTrigger value="微积分" className="rounded-full whitespace-nowrap">
-                      微积分
+                      {t('tutorials.calculus')}
                     </TabsTrigger>
                     <TabsTrigger value="三角函数" className="rounded-full whitespace-nowrap">
-                      三角函数
+                      {t('tutorials.trigonometry')}
                     </TabsTrigger>
                     <TabsTrigger value="概率统计" className="rounded-full whitespace-nowrap">
-                      概率统计
+                      {t('tutorials.statistics')}
                     </TabsTrigger>
                   </div>
                 </ScrollArea>
@@ -201,7 +216,7 @@ export default function TutorialsPage() {
 
                       <div className="flex items-center gap-2 flex-wrap">
                         <Badge variant="secondary" className={getDifficultyColor(tutorial.difficulty)}>
-                          {tutorial.difficulty}
+                          {getDifficultyLabel(tutorial.difficulty)}
                         </Badge>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="h-3 w-3" />
@@ -209,7 +224,7 @@ export default function TutorialsPage() {
                         </div>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <BookOpen className="h-3 w-3" />
-                          <span>{tutorial.lessons}课</span>
+                          <span>{tutorial.lessons}{t('tutorials.lessons')}</span>
                         </div>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
@@ -220,7 +235,7 @@ export default function TutorialsPage() {
                       {tutorial.progress !== undefined && (
                         <div className="mt-3">
                           <div className="flex items-center justify-between text-xs mb-1">
-                            <span className="text-muted-foreground">学习进度</span>
+                            <span className="text-muted-foreground">{t('tutorials.learningProgress')}</span>
                             <span className="text-primary font-medium">{tutorial.progress}%</span>
                           </div>
                           <div className="h-1.5 bg-muted rounded-full overflow-hidden">
@@ -265,7 +280,7 @@ export default function TutorialsPage() {
 
                 <div className="flex items-center gap-3 mb-4 flex-wrap">
                   <Badge variant="secondary" className={getDifficultyColor(selectedTutorial.difficulty)}>
-                    {selectedTutorial.difficulty}
+                    {getDifficultyLabel(selectedTutorial.difficulty)}
                   </Badge>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Clock className="h-4 w-4" />
@@ -273,7 +288,7 @@ export default function TutorialsPage() {
                   </div>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <BookOpen className="h-4 w-4" />
-                    <span>{selectedTutorial.lessons}课</span>
+                    <span>{selectedTutorial.lessons}{t('tutorials.lessons')}</span>
                   </div>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
@@ -283,7 +298,7 @@ export default function TutorialsPage() {
 
                 <Separator className="my-4" />
 
-                <h4 className="font-semibold mb-3">课程内容</h4>
+                <h4 className="font-semibold mb-3">{t('tutorials.courseContent')}</h4>
                 <ScrollArea className="h-[200px] pr-4">
                   <div className="space-y-2">
                     {lessonsList.map((lesson) => (
@@ -311,7 +326,7 @@ export default function TutorialsPage() {
 
                 <div className="mt-6 flex gap-2">
                   <Button className="flex-1" size="lg">
-                    {selectedTutorial.progress ? "继续学习" : "开始学习"}
+                    {selectedTutorial.progress ? t('tutorials.continueLearning') : t('tutorials.startLearning')}
                   </Button>
                 </div>
               </div>

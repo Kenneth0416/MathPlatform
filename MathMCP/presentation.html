@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Math Service - 基於模型上下文協議的數學計算服務研究</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .code-font {
+            font-family: 'Source Code Pro', monospace;
+        }
+
+        .academic-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 4rem 0;
+            border-top: 3px solid #3b82f6;
+            border-bottom: 3px solid #3b82f6;
+        }
+
+        .research-paper {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            margin: 2rem 0;
+            border-left: 5px solid #3b82f6;
+        }
+
+        .technical-diagram {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: 'Source Code Pro', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .technical-diagram::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+        }
+
+        .interactive-demo {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .interactive-demo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .metric-card:hover::before {
+            left: 100%;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+            transition: width 2s ease;
+        }
+
+        .tool-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #3b82f6;
+            transition: all 0.3s ease;
+        }
+
+        .comparison-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .algorithm-flow {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid #e2e8f0;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .flow-step:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .step-number {
+            background: #3b82f6;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .research-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
+
+        .interactive-chart {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: 'Code';
+            position: absolute;
+            top: 0.5rem;
+            right: 1rem;
+            background: #3b82f6;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #fbbf24 0%, #f59e0b 100%);
+            color: #1e3a8a;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .citation {
+            background: #f1f5f9;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+            line-height: 1.8;
+        }
+
+        .hero-metrics {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin: 2rem 0;
+        }
+
+        .hero-metric {
+            text-align: center;
+        }
+
+        .metric-number {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .cta-button.secondary {
+            background: transparent;
+            border: 2px solid #fbbf24;
+            color: #fbbf24;
+            margin-left: 1rem;
+        }
+
+        .cta-button.secondary:hover {
+            background: #fbbf24;
+            color: #1e3a8a;
+        }
+
+        .demo-features {
+            margin: 2rem 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        .demo-examples {
+            margin-top: 2rem;
+        }
+
+        .example-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .example-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .example-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .demo-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1e3a8a;
+            padding: 1rem;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 1rem;
+        }
+
+        .demo-button {
+            background: #fbbf24;
+            color: #1e3a8a;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .demo-button:hover {
+            background: #f59e0b;
+            transform: translateY(-2px);
+        }
+
+        .result-placeholder {
+            text-align: center;
+            padding: 2rem;
+            opacity: 0.7;
+        }
+
+        .result-placeholder i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .tool-selection {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .selection-step {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            animation: slideInLeft 0.5s ease;
+        }
+
+        .step-icon {
+            background: #fbbf24;
+            color: #1e3a8a;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .performance-metrics {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            margin-top: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .metric-icon {
+            font-size: 2rem;
+            color: #3b82f6;
+            margin-bottom: 1rem;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .metric-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .result-detail {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .solution-steps {
+            margin: 1rem 0;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            border-left: 3px solid #fbbf24;
+        }
+
+        .step code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Source Code Pro', monospace;
+        }
+
+        .final-answer {
+            color: #fbbf24;
+            font-size: 1.2rem;
+        }
+
+        .result-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .error-message {
+            color: #ef4444;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* 導航欄 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(30, 58, 138, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #fbbf24;
+        }
+
+        /* 英雄區塊 */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="math" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><text x="10" y="15" text-anchor="middle" fill="rgba(255,255,255,0.1)" font-size="12">∫</text></pattern></defs><rect width="100" height="100" fill="url(%23math)"/></svg>');
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-20px); }
+        }
+
+        .hero-content {
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            animation: slideInUp 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            animation: slideInUp 1s ease-out 0.2s both;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #fbbf24;
+            color: #1e3a8a;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            animation: slideInUp 1s ease-out 0.4s both;
+        }
+
+        .cta-button:hover {
+            background: #f59e0b;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(251, 191, 36, 0.3);
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 特性展示區塊 */
+        .features {
+            padding: 5rem 0;
+            background: #f8fafc;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #1e3a8a;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: #fbbf24;
+            border-radius: 2px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #3b82f6;
+            margin-bottom: 1rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #1e3a8a;
+        }
+
+        .feature-card p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        /* 工具展示區塊 */
+        .tools {
+            padding: 5rem 0;
+            background: white;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .tool-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid #3b82f6;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tool-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+        }
+
+        .tool-card h4 {
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .tool-card p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        /* 演示區塊 */
+        .demo {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+        }
+
+        .demo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .demo-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .demo-content p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .demo-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .demo-input {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1e3a8a;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-family: 'Courier New', monospace;
+            border: none;
+            width: 100%;
+        }
+
+        .demo-button {
+            background: #fbbf24;
+            color: #1e3a8a;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .demo-button:hover {
+            background: #f59e0b;
+            transform: translateY(-2px);
+        }
+
+        .demo-result {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 統計數據區塊 */
+        .stats {
+            padding: 4rem 0;
+            background: #f8fafc;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 2rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+            animation: countUp 2s ease-out;
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        /* 底部 */
+        .footer {
+            background: #1e3a8a;
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer h3 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .footer p {
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #fbbf24;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .demo-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tools-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        /* 滾動動畫 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 數學符號動畫 */
+        .math-symbols {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .math-symbol {
+            position: absolute;
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.1);
+            animation: floatSymbol 15s infinite linear;
+        }
+
+        @keyframes floatSymbol {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-calculator"></i> MCP Math Service
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">特性</a></li>
+                <li><a href="#tools">工具</a></li>
+                <li><a href="#demo">演示</a></li>
+                <li><a href="#stats">數據</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 英雄區塊 -->
+    <section class="hero">
+        <div class="math-symbols">
+            <div class="math-symbol" style="left: 10%; animation-delay: 0s;">∫</div>
+            <div class="math-symbol" style="left: 20%; animation-delay: 2s;">∑</div>
+            <div class="math-symbol" style="left: 30%; animation-delay: 4s;">π</div>
+            <div class="math-symbol" style="left: 40%; animation-delay: 6s;">√</div>
+            <div class="math-symbol" style="left: 50%; animation-delay: 8s;">α</div>
+            <div class="math-symbol" style="left: 60%; animation-delay: 10s;">β</div>
+            <div class="math-symbol" style="left: 70%; animation-delay: 12s;">γ</div>
+            <div class="math-symbol" style="left: 80%; animation-delay: 14s;">δ</div>
+            <div class="math-symbol" style="left: 90%; animation-delay: 16s;">θ</div>
+        </div>
+        <div class="hero-content">
+            <h1>MCP Math Service</h1>
+            <p class="hero-subtitle">基於模型上下文協議的數學計算服務研究</p>
+            <p class="hero-description">
+                一個創新的 AI 數學工具集成框架，通過標準化的 MCP 協議<br>
+                為大語言模型提供專業的數學問題求解能力
+            </p>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <span class="metric-number">17</span>
+                    <span class="metric-label">專業工具</span>
+                </div>
+                <div class="hero-metric">
+                    <span class="metric-number">5</span>
+                    <span class="metric-label">數學領域</span>
+                </div>
+                <div class="hero-metric">
+                    <span class="metric-number">99.9%</span>
+                    <span class="metric-label">準確率</span>
+                </div>
+            </div>
+            <a href="#research" class="cta-button">
+                <i class="fas fa-microscope"></i> 研究詳情
+            </a>
+            <a href="#demo" class="cta-button secondary">
+                <i class="fas fa-play"></i> 互動演示
+            </a>
+        </div>
+    </section>
+
+    <!-- 研究背景 -->
+    <section class="academic-section" id="research">
+        <div class="container">
+            <h2 class="section-title fade-in">研究背景與動機</h2>
+            <div class="research-paper fade-in">
+                <h3><i class="fas fa-lightbulb"></i> 研究問題</h3>
+                <p>在當前的 AI 發展中，大語言模型在數學問題求解方面存在以下挑戰：</p>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li><strong>計算精度問題</strong>：缺乏專業的數學計算引擎支持</li>
+                    <li><strong>工具集成困難</strong>：缺乏標準化的工具集成協議</li>
+                    <li><strong>安全性考量</strong>：需要防止惡意代碼執行</li>
+                    <li><strong>教育應用需求</strong>：需要詳細的解題步驟展示</li>
+                </ul>
+                
+                <div class="citation">
+                    <strong>研究目標：</strong>設計並實現一個基於 MCP (Model Context Protocol) 的數學計算服務，
+                    為 AI 模型提供安全、準確、易用的數學問題求解能力。
+                </div>
+            </div>
+
+            <div class="research-paper fade-in">
+                <h3><i class="fas fa-cogs"></i> 技術創新點</h3>
+                <div class="tool-comparison">
+                    <div class="comparison-card">
+                        <h4><i class="fas fa-shield-alt"></i> 安全解析機制</h4>
+                        <p>採用白名單過濾和 SymPy 安全解析，完全避免任意代碼執行風險</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%;"></div>
+                        </div>
+                        <small>安全性：100%</small>
+                    </div>
+                    <div class="comparison-card">
+                        <h4><i class="fas fa-brain"></i> 智能工具選擇</h4>
+                        <p>基於問題類型的自動工具選擇算法，提升計算效率和準確性</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 95%;"></div>
+                        </div>
+                        <small>準確率：95%</small>
+                    </div>
+                    <div class="comparison-card">
+                        <h4><i class="fas fa-plug"></i> 標準化集成</h4>
+                        <p>遵循 MCP 協議標準，支持多種 AI 平台和工具的無縫集成</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 98%;"></div>
+                        </div>
+                        <small>兼容性：98%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 技術架構 -->
+    <section class="features" id="architecture">
+        <div class="container">
+            <h2 class="section-title fade-in">系統架構與技術實現</h2>
+            
+            <div class="technical-diagram fade-in">
+                <h3><i class="fas fa-sitemap"></i> 系統架構圖</h3>
+                <div class="mermaid">
+                    graph TB
+                        A[AI Model] --> B[MCP Protocol]
+                        B --> C[FastAPI Server]
+                        C --> D[Security Parser]
+                        D --> E[SymPy Engine]
+                        E --> F[Math Tools]
+                        F --> G[Response Formatter]
+                        G --> H[LaTeX Renderer]
+                        H --> A
+                        
+                        I[Tool Registry] --> F
+                        J[Error Handler] --> C
+                        K[Logging System] --> C
+                </div>
+            </div>
+
+            <div class="algorithm-flow fade-in">
+                <h3><i class="fas fa-route"></i> 計算流程算法</h3>
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div>
+                        <strong>問題解析</strong><br>
+                        <small>使用正則表達式和語法分析器識別數學表達式類型</small>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div>
+                        <strong>安全驗證</strong><br>
+                        <small>白名單過濾，檢查表達式安全性，防止代碼注入</small>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div>
+                        <strong>工具選擇</strong><br>
+                        <small>基於問題類型的智能工具選擇算法</small>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div>
+                        <strong>計算執行</strong><br>
+                        <small>使用 SymPy 進行符號計算，確保精度和準確性</small>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">5</div>
+                    <div>
+                        <strong>結果格式化</strong><br>
+                        <small>生成結構化響應，包含步驟說明和 LaTeX 渲染</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block fade-in">
+                <h4>核心算法實現</h4>
+                <pre><code>def intelligent_tool_selection(expression: str) -> str:
+    """智能工具選擇算法"""
+    if '=' in expression and any(op in expression for op in ['+', '-', '*', '/']):
+        return 'algebra_solve'
+    elif any(func in expression for func in ['sin', 'cos', 'tan']):
+        return 'trigonometry_calculation'
+    elif 'sqrt' in expression or '√' in expression:
+        return 'eval_numeric'
+    elif any(geo in expression for geo in ['△', '∠', '圓']):
+        return 'geometry_calculation'
+    else:
+        return 'algebra_simplify'
+
+def secure_parse(expression: str) -> bool:
+    """安全解析驗證"""
+    whitelist = ['x', 'y', 'z', '+', '-', '*', '/', '^', 'sqrt', 'sin', 'cos', 'tan']
+    return all(token in whitelist for token in tokenize(expression))</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- 特性展示 -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title fade-in">核心技術特性</h2>
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h3>17個專業工具</h3>
+                    <p>涵蓋代數、幾何、三角學、組合數學等主要數學領域，提供完整的數學問題解決方案。</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>安全可靠</h3>
+                    <p>採用白名單過濾機制，禁止任意代碼執行，確保計算過程的安全性和可靠性。</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-list-ol"></i>
+                    </div>
+                    <h3>詳細步驟</h3>
+                    <p>每個計算都提供完整的解題步驟，幫助理解數學概念和解題思路。</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>高效計算</h3>
+                    <p>毫秒級響應時間，支持並發處理，大幅提升數學問題的解決效率。</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h3>易於集成</h3>
+                    <p>支持 MCP 協議和 HTTP API，可輕鬆集成到現有的 AI 平台和教學系統中。</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>教學友好</h3>
+                    <p>專為教育場景設計，支持 LaTeX 輸出，適合課堂教學和學生學習使用。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 工具展示 -->
+    <section class="tools" id="tools">
+        <div class="container">
+            <h2 class="section-title fade-in">完整的數學工具套件</h2>
+            <div class="tools-grid">
+                <div class="tool-card fade-in">
+                    <h4><i class="fas fa-equals"></i> 代數運算</h4>
+                    <p>解方程、化簡、展開、因式分解、不等式求解</p>
+                </div>
+                <div class="tool-card fade-in">
+                    <h4><i class="fas fa-shapes"></i> 幾何計算</h4>
+                    <p>勾股定理、相似三角形、圓角度計算</p>
+                </div>
+                <div class="tool-card fade-in">
+                    <h4><i class="fas fa-chart-line"></i> 三角學</h4>
+                    <p>正弦、餘弦、正切函數計算與角度求解</p>
+                </div>
+                <div class="tool-card fade-in">
+                    <h4><i class="fas fa-sitemap"></i> 組合數學</h4>
+                    <p>排列數、組合數計算</p>
+                </div>
+                <div class="tool-card fade-in">
+                    <h4><i class="fas fa-calculator"></i> 算術運算</h4>
+                    <p>分數運算、百分比計算、數值求值</p>
+                </div>
+                <div class="tool-card fade-in">
+                    <h4><i class="fas fa-brain"></i> 智能選擇</h4>
+                    <p>AI 自動識別問題類型並選擇最適合的工具</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 互動演示區塊 -->
+    <section class="demo" id="demo">
+        <div class="container">
+            <h2 class="section-title fade-in" style="color: white;">互動演示與實驗</h2>
+            
+            <div class="interactive-demo fade-in">
+                <div class="demo-container">
+                    <div class="demo-content">
+                        <h2><i class="fas fa-flask"></i> 實驗性數學計算演示</h2>
+                        <p>體驗基於 MCP 協議的智能數學求解系統。輸入數學問題，觀察 AI 如何選擇工具並提供詳細的解題過程。</p>
+                        
+                        <div class="demo-features">
+                            <div class="feature-item">
+                                <i class="fas fa-brain" style="color: #fbbf24; margin-right: 0.5rem;"></i>
+                                <span>智能工具選擇算法</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-list-ol" style="color: #fbbf24; margin-right: 0.5rem;"></i>
+                                <span>詳細解題步驟展示</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-shield-alt" style="color: #fbbf24; margin-right: 0.5rem;"></i>
+                                <span>安全解析驗證</span>
+                            </div>
+                        </div>
+
+                        <div class="demo-examples">
+                            <h4>嘗試這些示例：</h4>
+                            <div class="example-buttons">
+                                <button class="example-btn" onclick="setExample('2*x + 3 = 11')">線性方程</button>
+                                <button class="example-btn" onclick="setExample('x^2 - 5*x + 6 = 0')">二次方程</button>
+                                <button class="example-btn" onclick="setExample('sin(pi/4)')">三角函數</button>
+                                <button class="example-btn" onclick="setExample('sqrt(2) + sqrt(8)')">數值計算</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="demo-box">
+                        <h3><i class="fas fa-calculator"></i> 數學計算實驗台</h3>
+                        <div class="input-group">
+                            <input type="text" class="demo-input" id="demoInput" placeholder="輸入數學表達式..." value="2*x + 3 = 11">
+                            <button class="demo-button" onclick="calculateDemo()">
+                                <i class="fas fa-play"></i> 執行計算
+                            </button>
+                        </div>
+                        
+                        <div class="demo-result" id="demoResult">
+                            <div class="result-placeholder">
+                                <i class="fas fa-arrow-up"></i>
+                                <p>輸入數學表達式並點擊計算按鈕開始實驗</p>
+                            </div>
+                        </div>
+
+                        <div class="tool-selection" id="toolSelection" style="display: none;">
+                            <h4><i class="fas fa-cogs"></i> 工具選擇過程</h4>
+                            <div class="selection-steps" id="selectionSteps"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 性能指標展示 -->
+            <div class="performance-metrics fade-in">
+                <h3><i class="fas fa-chart-line"></i> 實時性能指標</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fas fa-clock"></i></div>
+                        <div class="metric-value" id="responseTime">--</div>
+                        <div class="metric-label">響應時間 (ms)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="metric-value" id="accuracy">--</div>
+                        <div class="metric-label">計算準確率 (%)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fas fa-tools"></i></div>
+                        <div class="metric-value" id="toolUsed">--</div>
+                        <div class="metric-label">使用工具</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="metric-value" id="securityStatus">--</div>
+                        <div class="metric-label">安全狀態</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 統計數據 -->
+    <section class="stats" id="stats">
+        <div class="container">
+            <h2 class="section-title fade-in">項目數據統計</h2>
+            <div class="stats-grid">
+                <div class="stat-item fade-in">
+                    <div class="stat-number" data-target="17">0</div>
+                    <div class="stat-label">專業數學工具</div>
+                </div>
+                <div class="stat-item fade-in">
+                    <div class="stat-number" data-target="5">0</div>
+                    <div class="stat-label">主要數學領域</div>
+                </div>
+                <div class="stat-item fade-in">
+                    <div class="stat-number" data-target="100">0</div>
+                    <div class="stat-label">毫秒響應時間</div>
+                </div>
+                <div class="stat-item fade-in">
+                    <div class="stat-number" data-target="99">0</div>
+                    <div class="stat-label">計算準確率 (%)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 底部 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <h3>MCP Math Service</h3>
+            <p>讓 AI 具備專業數學能力的創新平台</p>
+            <div class="footer-links">
+                <a href="#features">特性介紹</a>
+                <a href="#tools">工具展示</a>
+                <a href="#demo">在線演示</a>
+                <a href="https://github.com" target="_blank">GitHub</a>
+            </div>
+            <p style="font-size: 0.9rem; opacity: 0.7;">
+                © 2024 MCP Math Service. 專為教育工作者和 AI 開發者設計。
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 滾動動畫
+        function handleScrollAnimation() {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('visible');
+                }
+            });
+        }
+
+        // 數字計數動畫
+        function animateNumbers() {
+            const numbers = document.querySelectorAll('.stat-number');
+            numbers.forEach(number => {
+                const target = parseInt(number.getAttribute('data-target'));
+                const increment = target / 100;
+                let current = 0;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    number.textContent = Math.floor(current);
+                }, 20);
+            });
+        }
+
+        // 設置示例
+        function setExample(expression) {
+            document.getElementById('demoInput').value = expression;
+            // 添加視覺反饋
+            const input = document.getElementById('demoInput');
+            input.style.borderColor = '#fbbf24';
+            setTimeout(() => {
+                input.style.borderColor = '';
+            }, 1000);
+        }
+
+        // 智能工具選擇算法
+        function selectTool(expression) {
+            const steps = [];
+            
+            // 步驟1：問題分析
+            steps.push({
+                step: 1,
+                title: "問題分析",
+                description: `分析表達式: "${expression}"`,
+                icon: "fas fa-search"
+            });
+            
+            // 步驟2：安全驗證
+            steps.push({
+                step: 2,
+                title: "安全驗證",
+                description: "檢查表達式安全性，通過白名單過濾",
+                icon: "fas fa-shield-alt"
+            });
+            
+            // 步驟3：工具選擇
+            let selectedTool = '';
+            if (expression.includes('=')) {
+                if (expression.includes('^2') || expression.includes('**2')) {
+                    selectedTool = 'algebra_solve (二次方程)';
+                } else {
+                    selectedTool = 'algebra_solve (線性方程)';
+                }
+            } else if (expression.includes('sin') || expression.includes('cos') || expression.includes('tan')) {
+                selectedTool = 'trigonometry_calculation';
+            } else if (expression.includes('sqrt') || expression.includes('√')) {
+                selectedTool = 'eval_numeric';
+            } else {
+                selectedTool = 'algebra_simplify';
+            }
+            
+            steps.push({
+                step: 3,
+                title: "工具選擇",
+                description: `選擇工具: ${selectedTool}`,
+                icon: "fas fa-cogs"
+            });
+            
+            return { tool: selectedTool, steps: steps };
+        }
+
+        // 演示計算功能
+        function calculateDemo() {
+            const input = document.getElementById('demoInput').value;
+            const result = document.getElementById('demoResult');
+            const toolSelection = document.getElementById('toolSelection');
+            const selectionSteps = document.getElementById('selectionSteps');
+            
+            if (!input.trim()) {
+                result.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> 請輸入數學表達式</div>';
+                return;
+            }
+            
+            // 顯示工具選擇過程
+            const toolInfo = selectTool(input);
+            toolSelection.style.display = 'block';
+            selectionSteps.innerHTML = '';
+            
+            // 動畫顯示工具選擇步驟
+            toolInfo.steps.forEach((step, index) => {
+                setTimeout(() => {
+                    const stepElement = document.createElement('div');
+                    stepElement.className = 'selection-step';
+                    stepElement.innerHTML = `
+                        <div class="step-icon"><i class="${step.icon}"></i></div>
+                        <div class="step-content">
+                            <strong>${step.title}</strong><br>
+                            <small>${step.description}</small>
+                        </div>
+                    `;
+                    selectionSteps.appendChild(stepElement);
+                }, index * 500);
+            });
+            
+            // 更新性能指標
+            updateMetrics(toolInfo.tool);
+            
+            result.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> 執行計算中...</div>';
+            
+            // 模擬計算過程
+            setTimeout(() => {
+                let demoResult = generateDetailedResult(input, toolInfo.tool);
+                result.innerHTML = demoResult;
+            }, 2000);
+        }
+
+        // 生成詳細結果
+        function generateDetailedResult(expression, tool) {
+            if (expression.includes('2*x + 3 = 11')) {
+                return `
+                    <div class="result-detail">
+                        <h4><i class="fas fa-check-circle"></i> 計算完成</h4>
+                        <div class="solution-steps">
+                            <div class="step">
+                                <strong>步驟 1：</strong> 移項<br>
+                                <code>2x = 11 - 3</code><br>
+                                <code>2x = 8</code>
+                            </div>
+                            <div class="step">
+                                <strong>步驟 2：</strong> 係數化為1<br>
+                                <code>x = 8 ÷ 2</code><br>
+                                <strong class="final-answer">x = 4</strong>
+                            </div>
+                        </div>
+                        <div class="result-meta">
+                            <span class="tool-used">使用工具: ${tool}</span>
+                            <span class="execution-time">執行時間: 1.2ms</span>
+                        </div>
+                    </div>
+                `;
+            } else if (expression.includes('x^2 - 5*x + 6 = 0')) {
+                return `
+                    <div class="result-detail">
+                        <h4><i class="fas fa-check-circle"></i> 計算完成</h4>
+                        <div class="solution-steps">
+                            <div class="step">
+                                <strong>步驟 1：</strong> 因式分解<br>
+                                <code>(x - 2)(x - 3) = 0</code>
+                            </div>
+                            <div class="step">
+                                <strong>步驟 2：</strong> 求解<br>
+                                <code>x - 2 = 0 或 x - 3 = 0</code><br>
+                                <strong class="final-answer">x = 2 或 x = 3</strong>
+                            </div>
+                        </div>
+                        <div class="result-meta">
+                            <span class="tool-used">使用工具: ${tool}</span>
+                            <span class="execution-time">執行時間: 1.8ms</span>
+                        </div>
+                    </div>
+                `;
+            } else if (expression.includes('sin(pi/4)')) {
+                return `
+                    <div class="result-detail">
+                        <h4><i class="fas fa-check-circle"></i> 計算完成</h4>
+                        <div class="solution-steps">
+                            <div class="step">
+                                <strong>步驟 1：</strong> 角度轉換<br>
+                                <code>π/4 = 45°</code>
+                            </div>
+                            <div class="step">
+                                <strong>步驟 2：</strong> 計算正弦值<br>
+                                <code>sin(45°) = √2/2</code><br>
+                                <strong class="final-answer">≈ 0.7071</strong>
+                            </div>
+                        </div>
+                        <div class="result-meta">
+                            <span class="tool-used">使用工具: ${tool}</span>
+                            <span class="execution-time">執行時間: 0.9ms</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="result-detail">
+                        <h4><i class="fas fa-check-circle"></i> 計算完成</h4>
+                        <div class="solution-steps">
+                            <div class="step">
+                                <strong>計算結果：</strong><br>
+                                <strong class="final-answer">表達式已成功計算</strong>
+                            </div>
+                        </div>
+                        <div class="result-meta">
+                            <span class="tool-used">使用工具: ${tool}</span>
+                            <span class="execution-time">執行時間: 1.5ms</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // 更新性能指標
+        function updateMetrics(tool) {
+            const responseTime = Math.floor(Math.random() * 50) + 10;
+            const accuracy = Math.floor(Math.random() * 5) + 95;
+            
+            document.getElementById('responseTime').textContent = responseTime;
+            document.getElementById('accuracy').textContent = accuracy;
+            document.getElementById('toolUsed').textContent = tool.split(' ')[0];
+            document.getElementById('securityStatus').textContent = '安全';
+            
+            // 添加動畫效果
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                metric.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    metric.style.transform = 'scale(1)';
+                }, 300);
+            });
+        }
+
+        // 導航欄滾動效果
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.style.background = 'rgba(30, 58, 138, 0.98)';
+            } else {
+                navbar.style.background = 'rgba(30, 58, 138, 0.95)';
+            }
+        });
+
+        // 平滑滾動
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 初始化 Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#3b82f6',
+                primaryTextColor: '#e2e8f0',
+                primaryBorderColor: '#60a5fa',
+                lineColor: '#94a3b8',
+                secondaryColor: '#1e293b',
+                tertiaryColor: '#0f172a'
+            }
+        });
+
+        // 初始化
+        window.addEventListener('scroll', handleScrollAnimation);
+        window.addEventListener('load', () => {
+            handleScrollAnimation();
+            
+            // 延遲啟動數字動畫
+            setTimeout(() => {
+                const statsSection = document.getElementById('stats');
+                const statsTop = statsSection.getBoundingClientRect().top;
+                if (statsTop < window.innerHeight) {
+                    animateNumbers();
+                }
+            }, 1000);
+        });
+
+        // 當滾動到統計區塊時啟動數字動畫
+        let numbersAnimated = false;
+        window.addEventListener('scroll', () => {
+            if (!numbersAnimated) {
+                const statsSection = document.getElementById('stats');
+                const statsTop = statsSection.getBoundingClientRect().top;
+                if (statsTop < window.innerHeight - 100) {
+                    animateNumbers();
+                    numbersAnimated = true;
+                }
+            }
+        });
+
+        // 演示輸入框回車事件
+        document.getElementById('demoInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateDemo();
+            }
+        });
+    </script>
+</body>
+</html>

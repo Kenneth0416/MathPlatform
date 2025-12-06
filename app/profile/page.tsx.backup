@@ -1,0 +1,842 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { useAuth } from "@/hooks/use-auth"
+import { MobileHeader } from "@/components/mobile-header"
+import { MobileNav } from "@/components/mobile-nav"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+  Settings,
+  Heart,
+  Bookmark,
+  FileText,
+  Award,
+  TrendingUp,
+  ChevronRight,
+  Bell,
+  Moon,
+  Globe,
+  HelpCircle,
+  LogOut,
+  Edit,
+  MessageSquare,
+  Plus,
+} from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import { useI18n } from "@/lib/i18n-context"
+import { AvatarUpload } from "@/components/avatar-upload"
+import type { Language } from "@/lib/locales"
+import Link from "next/link"
+
+
+interface UserProfile {
+  id: string
+  email: string
+  username: string
+  avatar?: string
+  bio?: string
+  language: string
+  notifications: boolean
+  darkMode: boolean
+  createdAt: string
+  totalStudyTime: number
+  totalMessages: number
+  streak: number
+  _count: {
+    conversations: number
+    userAchievements: number
+  }
+}
+
+interface Achievement {
+  id: number
+  title: string
+  description: string
+  icon: string
+  unlocked: boolean
+  date?: string
+}
+
+
+
+
+export default function ProfilePage() {
+  const { t, language, setLanguage } = useI18n()
+  const { user, isAuthenticated } = useAuth()
+  const [showEditProfile, setShowEditProfile] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [showLanguageSettings, setShowLanguageSettings] = useState(false)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [analyticsData, setAnalyticsData] = useState<any>(null)
+  const [conversations, setConversations] = useState<any[]>([])
+  const [conversationsLoading, setConversationsLoading] = useState(true)
+  const [achievements, setAchievements] = useState<any[]>([])
+  const [achievementsLoading, setAchievementsLoading] = useState(true)
+  const [tutorialProgress, setTutorialProgress] = useState<any>(null)
+  const [tutorialProgressLoading, setTutorialProgressLoading] = useState(true)
+
+  // 表單狀態
+  const [username, setUsername] = useState("")
+  const [bio, setBio] = useState("")
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [notifications, setNotifications] = useState(true)
+  const [darkMode, setDarkMode] = useState(false)
+
+  // 獲取用戶資料
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!isAuthenticated) return
+
+      try {
+        setLoading(true)
+        const response = await fetch("/api/users/profile")
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch profile")
+        }
+
+        const data = await response.json()
+        setUserProfile(data.user)
+        setUsername(data.user.username || "")
+        setBio(data.user.bio || "")
+        setAvatarUrl(data.user.avatar)
+        setNotifications(data.user.notifications !== false) // default to true
+        setDarkMode(data.user.darkMode || false)
+        // Set language if it's different from current
+        if (data.user.language && data.user.language !== language) {
+          setLanguage(data.user.language as Language)
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUserProfile()
+  }, [isAuthenticated])
+
+  // 獲取學習分析數據
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      if (!isAuthenticated) return
+
+      try {
+        const response = await fetch("/api/analytics?period=month")
+        if (response.ok) {
+          const data = await response.json()
+          setAnalyticsData(data)
+        }
+      } catch (error) {
+        console.error("Error fetching analytics:", error)
+      }
+    }
+
+    fetchAnalytics()
+  }, [isAuthenticated])
+
+  // 獲取用戶對話歷史
+  useEffect(() => {
+    const fetchConversations = async () => {
+      if (!isAuthenticated) return
+
+      try {
+        setConversationsLoading(true)
+        const response = await fetch("/api/conversations?limit=10&sort=recent")
+
+        if (response.ok) {
+          const data = await response.json()
+          setConversations(data.conversations || [])
+        } else {
+          console.error("Failed to fetch conversations")
+        }
+      } catch (error) {
+        console.error("Error fetching conversations:", error)
+      } finally {
+        setConversationsLoading(false)
+      }
+    }
+
+    fetchConversations()
+  }, [isAuthenticated])
+
+  // 獲取成就
+  useEffect(() => {
+    const fetchAchievements = async () => {
+      if (!isAuthenticated) return
+
+      try {
+        setAchievementsLoading(true)
+        const response = await fetch("/api/users/achievements")
+
+        if (response.ok) {
+          const data = await response.json()
+          setAchievements(data.achievements || [])
+        } else {
+          console.error("Failed to fetch achievements")
+        }
+      } catch (error) {
+        console.error("Error fetching achievements:", error)
+      } finally {
+        setAchievementsLoading(false)
+      }
+    }
+
+    fetchAchievements()
+  }, [isAuthenticated])
+
+  // 獲取教學進度
+  useEffect(() => {
+    const fetchTutorialProgress = async () => {
+      if (!isAuthenticated) return
+
+      try {
+        setTutorialProgressLoading(true)
+        const response = await fetch("/api/users/progress")
+
+        if (response.ok) {
+          const data = await response.json()
+          setTutorialProgress(data)
+        } else {
+          console.error("Failed to fetch tutorial progress")
+        }
+      } catch (error) {
+        console.error("Error fetching tutorial progress:", error)
+      } finally {
+        setTutorialProgressLoading(false)
+      }
+    }
+
+    fetchTutorialProgress()
+  }, [isAuthenticated])
+
+  // 保存用戶資料
+  const handleSaveProfile = async () => {
+    if (!userProfile) return
+
+    try {
+      setSaving(true)
+      const response = await fetch("/api/users/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          bio: bio.trim(),
+          language,
+          notifications,
+          darkMode,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to update profile")
+      }
+
+      const data = await response.json()
+      setUserProfile(prev => prev ? { ...prev, ...data.user } : null)
+      setShowEditProfile(false)
+    } catch (error) {
+      console.error("Error updating profile:", error)
+      alert(error instanceof Error ? error.message : "更新失敗")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Save settings separately
+  const handleSaveSettings = async () => {
+    try {
+      setSaving(true)
+      const response = await fetch("/api/users/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          language,
+          notifications,
+          darkMode,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to update settings")
+      }
+
+      const data = await response.json()
+      setUserProfile(prev => prev ? { ...prev, ...data.user } : null)
+      setShowSettings(false)
+    } catch (error) {
+      console.error("Error updating settings:", error)
+      alert(error instanceof Error ? error.message : "設定失敗")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Apply dark mode setting
+  useEffect(() => {
+    if (userProfile?.darkMode !== undefined) {
+      if (userProfile.darkMode) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    }
+  }, [userProfile?.darkMode])
+
+  const languageOptions: { value: Language; label: string }[] = [
+    { value: "en", label: t('lang.english') },
+    { value: "zh-CN", label: t('lang.simplifiedChinese') },
+    { value: "zh-TW", label: t('lang.traditionalChinese') },
+  ]
+
+  // 格式化學習時間
+  const formatStudyTime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    return `${hours}小时${mins > 0 ? mins + '分' : ''}`
+  }
+
+  // 頭像變更回調
+  const handleAvatarChange = (newAvatarUrl: string | null) => {
+    setAvatarUrl(newAvatarUrl)
+    // 立即更新用戶資料顯示
+    if (userProfile) {
+      setUserProfile(prev => prev ? { ...prev, avatar: newAvatarUrl || undefined } : null)
+    }
+  }
+
+  // 格式化對話數據
+  const formatConversationForDisplay = (conversation: any) => {
+    const firstMessage = conversation.messages?.[0]
+    const lastMessage = conversation.messages?.[conversation.messages.length - 1]
+
+    return {
+      id: conversation.id,
+      title: firstMessage?.content?.substring(0, 50) || "Untitled Conversation",
+      messageCount: conversation.messageCount || conversation.messages?.length || 0,
+      lastActivity: conversation.timestamp,
+      mode: conversation.mode,
+      difficulty: conversation.difficulty,
+      language: conversation.language,
+      preview: lastMessage?.content?.substring(0, 100) || "No preview available"
+    }
+  }
+
+  // 格式化日期
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = now.getTime() - date.getTime()
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+    if (diffDays === 0) {
+      return t('time.today')
+    } else if (diffDays === 1) {
+      return t('time.yesterday')
+    } else if (diffDays < 7) {
+      return `${diffDays} ${t('time.ago')}`
+    } else {
+      return date.toLocaleDateString('zh-TW', {
+        month: 'short',
+        day: 'numeric'
+      })
+    }
+  }
+
+  return (
+    <div className="min-h-screen pb-16 bg-muted/30">
+      <MobileHeader title={t('profile.title')} />
+
+      <ScrollArea className="h-[calc(100vh-7rem)]">
+        <div className="max-w-screen-sm mx-auto">
+          {loading ? (
+            // Loading state
+            <Card className="m-4 mb-6">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">加载中...</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div>
+              {/* Profile Header */}
+              <Card className="m-4 mb-6">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4 mb-4">
+                    <Avatar className="h-20 w-20">
+                      <AvatarImage src={avatarUrl || userProfile?.avatar} />
+                      <AvatarFallback className="text-2xl">
+                        {userProfile?.username?.charAt(0)?.toUpperCase() || "用"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h2 className="text-xl font-bold">
+                          {userProfile?.username || "用户"}
+                        </h2>
+                        <Badge variant="secondary">Lv.5</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {bio || "热爱数学，喜欢分享学习心得"}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={() => setShowEditProfile(true)}>
+                          <Edit className="h-4 w-4 mr-1" />
+                          {t('profile.editProfile')}
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => setShowSettings(true)}>
+                          <Settings className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+              <Separator className="my-4" />
+
+              <div className="grid grid-cols-4 gap-4 text-center">
+                <div>
+                  <div className="text-xl font-bold">
+                    {userProfile?._count.conversations}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{t('profile.posts')}</div>
+                </div>
+                <div>
+                  <div className="text-xl font-bold">
+                    {userProfile?.totalMessages}
+                  </div>
+                  <div className="text-xs text-muted-foreground">消息</div>
+                </div>
+                <div>
+                  <div className="text-xl font-bold">
+                    {userProfile?.streak}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{t('progress.currentStreak')}</div>
+                </div>
+                <div>
+                  <div className="text-xl font-bold">
+                    {Math.floor((userProfile?.totalStudyTime || 0) / 60)}h
+                  </div>
+                  <div className="text-xs text-muted-foreground">{t('progress.studyTime')}</div>
+                </div>
+              </div>
+              </CardContent>
+            </Card>
+
+          {/* Learning Progress */}
+          <Card className="mx-4 mb-4">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                {t('profile.learningProgress')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Total Study Time */}
+              <div>
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span>{t('profile.totalStudyTime')}</span>
+                  <span className="font-semibold">
+                    {formatStudyTime(userProfile?.totalStudyTime || 0)}
+                  </span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-300"
+                    style={{
+                      width: `${Math.min(100, ((userProfile?.totalStudyTime || 0) / (100 * 60)) * 100)}%`
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Current Streak */}
+              <div>
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span>{t('progress.currentStreak')}</span>
+                  <span className="font-semibold">
+                    {userProfile?.streak || 0} {t('general.days')}
+                  </span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-green-500 rounded-full transition-all duration-300"
+                    style={{
+                      width: `${Math.min(100, ((userProfile?.streak || 0) / 30) * 100)}%`
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Weekly Study Time */}
+              {analyticsData?.weeklyStudyTime && (
+                <div>
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span>{t('profile.weeklyStudyTime')}</span>
+                    <span className="font-semibold">
+                      {formatStudyTime(analyticsData.weeklyStudyTime)}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-500 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${Math.min(100, (analyticsData.weeklyStudyTime / (7 * 60)) * 100)}%`
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Total Messages */}
+              <div>
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span>總消息數</span>
+                  <span className="font-semibold">
+                    {userProfile?.totalMessages || 0}
+                  </span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-purple-500 rounded-full transition-all duration-300"
+                    style={{
+                      width: `${Math.min(100, ((userProfile?.totalMessages || 0) / 1000) * 100)}%`
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Tutorial Progress */}
+              {tutorialProgress && (
+                <div>
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span>{t('profile.completedTutorials')}</span>
+                    <span className="font-semibold">
+                      {tutorialProgress.stats.completedTutorials} / {tutorialProgress.stats.totalTutorials}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-orange-500 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${tutorialProgress.stats.totalTutorials > 0 ? (tutorialProgress.stats.completedTutorials / tutorialProgress.stats.totalTutorials) * 100 : 0}%`
+                      }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    平均進度: {tutorialProgress.stats.averageProgress}%
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Tabs for Content */}
+          <Tabs defaultValue="posts" className="mx-4">
+            <TabsList className="w-full grid grid-cols-3">
+              <TabsTrigger value="posts">
+                <FileText className="h-4 w-4 mr-1" />
+                {t('profile.myPosts')}
+              </TabsTrigger>
+              <TabsTrigger value="liked">
+                <Heart className="h-4 w-4 mr-1" />
+                {t('profile.liked')}
+              </TabsTrigger>
+              <TabsTrigger value="achievements">
+                <Award className="h-4 w-4 mr-1" />
+                {t('profile.achievements')}
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="posts" className="mt-4 space-y-3">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">{t('profile.myPosts')}</h3>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/chatbot" className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    {t('conversation.new')}
+                  </Link>
+                </Button>
+              </div>
+
+              {conversationsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                  <span className="ml-2 text-muted-foreground">{t('status.loading')}</span>
+                </div>
+              ) : conversations.length === 0 ? (
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center py-8 text-center">
+                    <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium mb-2">{t('conversation.noConversations')}</h3>
+                    <p className="text-muted-foreground mb-4">
+                      {t('empty.noConversations')}
+                    </p>
+                    <Button asChild>
+                      <Link href="/chatbot">{t('conversation.new')}</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                conversations.map((conv) => (
+                  <Card key={conv.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                    <Link href={`/chatbot?conversation=${conv.id}`}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-sm mb-2 line-clamp-2">{conv.title}</h3>
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <MessageSquare className="h-3 w-3" />
+                                {conv._count?.messages || 0}
+                              </span>
+                              <span>{new Date(conv.updatedAt).toLocaleDateString(language === 'zh-TW' ? 'zh-TW' : language === 'zh-CN' ? 'zh-CN' : 'en-US')}</span>
+                            </div>
+                          </div>
+                          <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+                        </div>
+                      </CardContent>
+                    </Link>
+                  </Card>
+                ))
+              )}
+            </TabsContent>
+
+            <TabsContent value="liked" className="mt-4">
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Bookmark className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">{t('profile.noLikedContent')}</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="achievements" className="mt-4 space-y-3">
+              {achievementsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                  <span className="ml-2 text-muted-foreground">{t('status.loading')}</span>
+                </div>
+              ) : achievements.length === 0 ? (
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center py-8 text-center">
+                    <Award className="h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium mb-2">還沒有成就</h3>
+                    <p className="text-muted-foreground mb-4">
+                      開始學習解鎖你的第一個成就！
+                    </p>
+                    <Button asChild>
+                      <Link href="/tutorials">開始學習</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                achievements.map((achievement) => (
+                  <Card key={achievement.id} className={achievement.unlocked ? "" : "opacity-50"}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="text-3xl">{achievement.icon}</div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm mb-1">{achievement.title}</h3>
+                          <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                          {achievement.unlocked && achievement.unlockedAt && (
+                            <p className="text-xs text-primary mt-1">
+                              {t('profile.unlockedOn')} {new Date(achievement.unlockedAt).toLocaleDateString(language === 'zh-TW' ? 'zh-TW' : language === 'zh-CN' ? 'zh-CN' : 'en-US')}
+                            </p>
+                          )}
+                        </div>
+                        {achievement.unlocked ? (
+                          <Badge variant="secondary" className="bg-primary/10 text-primary">
+                            {t('profile.unlocked')}
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-muted-foreground">
+                            {achievement.points || 0} pts
+                          </Badge>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </TabsContent>
+          </Tabs>
+          </div>
+        </div>
+      </ScrollArea>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={showEditProfile} onOpenChange={setShowEditProfile}>
+        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t('profile.editProfile')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            {/* Avatar Upload */}
+            <div>
+              <Label>頭像</Label>
+              <div className="mt-2">
+                <AvatarUpload
+                  currentAvatar={avatarUrl || userProfile?.avatar}
+                  username={userProfile?.username}
+                  onAvatarChange={handleAvatarChange}
+                />
+              </div>
+            </div>
+
+            {/* Profile Info */}
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="username">{t('profile.username')}</Label>
+                <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} className="mt-2" />
+              </div>
+              <div>
+                <Label htmlFor="bio">{t('profile.bio')}</Label>
+                <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} className="mt-2 min-h-[80px]" placeholder="簡單介紹一下自己..." />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditProfile(false)}>
+              {t('profile.cancel')}
+            </Button>
+            <Button onClick={handleSaveProfile} disabled={saving}>
+              {saving ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  保存中...
+                </>
+              ) : (
+                t('profile.save')
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Settings Dialog */}
+      <Dialog open={showSettings} onOpenChange={setShowSettings}>
+        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t('profile.settings')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Bell className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="font-medium text-sm">{t('profile.notifications')}</p>
+                  <p className="text-xs text-muted-foreground">{t('profile.notificationsDesc')}</p>
+                </div>
+              </div>
+              <Switch checked={notifications} onCheckedChange={setNotifications} />
+            </div>
+
+            <Separator />
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Moon className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="font-medium text-sm">{t('profile.darkMode')}</p>
+                  <p className="text-xs text-muted-foreground">{t('profile.darkModeDesc')}</p>
+                </div>
+              </div>
+              <Switch checked={darkMode} onCheckedChange={setDarkMode} />
+            </div>
+
+            <Separator />
+
+            <Button variant="ghost" className="w-full justify-start" size="lg" onClick={() => setShowLanguageSettings(true)}>
+              <Globe className="h-5 w-5 mr-3" />
+              <span>{t('profile.languageSettings')}</span>
+              <ChevronRight className="h-5 w-5 ml-auto" />
+            </Button>
+
+            <Button variant="ghost" className="w-full justify-start" size="lg">
+              <HelpCircle className="h-5 w-5 mr-3" />
+              <span>{t('profile.helpAndFeedback')}</span>
+              <ChevronRight className="h-5 w-5 ml-auto" />
+            </Button>
+
+            <Separator />
+
+            <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive" size="lg">
+              <LogOut className="h-5 w-5 mr-3" />
+              <span>{t('profile.logout')}</span>
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSettings(false)}>
+              {t('profile.cancel')}
+            </Button>
+            <Button onClick={handleSaveSettings} disabled={saving}>
+              {saving ? t('status.loading') : t('profile.save')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Language Settings Dialog */}
+      <Dialog open={showLanguageSettings} onOpenChange={setShowLanguageSettings}>
+        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t('profile.languageSettings')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground mb-4">
+                {t('lang.select')}
+              </p>
+              {languageOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={language === option.value ? "default" : "outline"}
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setLanguage(option.value)
+                    setShowLanguageSettings(false)
+                    setShowSettings(false)
+                  }}
+                >
+                  <Globe className="h-4 w-4 mr-3" />
+                  <span>{option.label}</span>
+                  {language === option.value && (
+                    <div className="ml-auto">
+                      <div className="w-2 h-2 bg-primary rounded-full" />
+                    </div>
+                  )}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <MobileNav />
+            </>
+          )}
+    </div>
+  )
+}

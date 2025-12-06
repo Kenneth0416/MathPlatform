@@ -7,7 +7,7 @@ export interface Conversation {
   timestamp: Date
   preview: string
   messages: Message[]
-  mode: 'solve' | 'tutor' | 'practice' | 'check' | 'board'
+  mode: 'solve' | 'tutor' | 'practice' | 'check'
   difficulty: 'K-6' | 'Middle' | 'High' | 'College' | 'Contest'
   language: 'zh-TW' | 'zh-CN' | 'en'
 }
@@ -20,6 +20,7 @@ export interface Message {
   steps?: MessageStep[]
   hasAlternative?: boolean
   knowledgePoints?: string[]
+  mcpCallInfos?: import('@/types/mcp').MCPCallInfo[]
 }
 
 export interface MessageStep {
@@ -60,6 +61,7 @@ export class ConversationManager {
   // 獲取所有對話
   getAllConversations(): Conversation[] {
     try {
+      if (typeof window === 'undefined') return []
       const stored = localStorage.getItem(this.storageKey)
       if (!stored) return []
 
@@ -107,7 +109,7 @@ export class ConversationManager {
   // 創建新對話
   createConversation(
     messages: Message[],
-    mode: 'solve' | 'tutor' | 'practice' | 'check' | 'board',
+    mode: 'solve' | 'tutor' | 'practice' | 'check',
     difficulty: 'K-6' | 'Middle' | 'High' | 'College' | 'Contest',
     language: 'zh-TW' | 'zh-CN' | 'en'
   ): Conversation {
@@ -161,7 +163,7 @@ export class ConversationManager {
   }
 
   // 按模式過濾對話
-  filterByMode(mode: 'solve' | 'tutor' | 'practice' | 'check' | 'board'): Conversation[] {
+  filterByMode(mode: 'solve' | 'tutor' | 'practice' | 'check'): Conversation[] {
     const conversations = this.getAllConversations()
     return conversations.filter(conv => conv.mode === mode)
   }
@@ -289,22 +291,19 @@ export class ConversationManager {
         solve: '數學解題',
         tutor: '數學輔導',
         practice: '練習題',
-        check: '作業檢查',
-        board: '白板討論'
+        check: '作業檢查'
       },
       'zh-CN': {
         solve: '数学解题',
         tutor: '数学辅导',
         practice: '练习题',
-        check: '作业检查',
-        board: '白板讨论'
+        check: '作业检查'
       },
       'en': {
         solve: 'Math Solving',
         tutor: 'Math Tutoring',
         practice: 'Practice Problems',
-        check: 'Homework Check',
-        board: 'Whiteboard Discussion'
+        check: 'Homework Check'
       }
     }
 
